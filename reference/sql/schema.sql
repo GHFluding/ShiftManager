@@ -34,6 +34,7 @@ CREATE TABLE Tasks(
     id BIGSERIAL PRIMARY KEY,
     machineId BIGSERIAL NOT NULL,
     shiftId BIGSERIAL NOT NULL,
+    frequency TaskFrequency NOT NULL,
     taskPriority TaskPriority NOT NULL,
     description TEXT NOT NULL,
     createdBy BIGSERIAL NOT NULL,

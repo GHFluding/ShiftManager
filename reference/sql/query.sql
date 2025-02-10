@@ -73,9 +73,9 @@ WHERE shiftId = $1 AND taskId = $2;
 
 --name: CreateTask: one
 INSERT INTO Tasks(
-    id, machineId, shiftId, taskPriority, description, createdBy, createdAt
+    id, machineId, shiftId, frequency, taskPriority, description, createdBy, createdAt
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7,
+    $1, $2, $3, $4, $5, $6, $7, $8
 )
 RETURNING *;
 -- name: DeleteTask :exec
