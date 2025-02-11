@@ -1,38 +1,38 @@
---name: CreateUser: one
+-- name: CreateUser :one
 INSERT INTO Users(
     id, bitrixid, name, role 
 ) VALUES (
     $1, $2, $3, $4
 )
 RETURNING *;
--- name: DeleteUser: exec
+-- name: DeleteUser :exec
 DELETE FROM Users
 WHERE id = $1;
---name: ChangeUserRole: exec
+-- name: ChangeUserRole :exec
 UPDATE Users
 SET 
-    role = $2,
+    role = $2
 WHERE id = $1;
---name: UsersList: many
+-- name: UsersList :many
 Select * FROM Users
 ORDER BY id;
---name: UsersListByRole: many
+-- name: UsersListByRole :many
 Select * FROM Users
 WHERE role = $1
 ORDER BY id;
 
 
---name: CreateShift: one
+-- name: CreateShift :one
 INSERT INTO Shifts(
     id, machineId, shift_master, createdAt, isActive, deactivatedAt
 ) VALUES (
     $1, $2, $3, $4, $5, $6
 )
 RETURNING *;
---name: ShiftList: many
+-- name: ShiftList :many
 Select * FROM Shifts
 ORDER BY id;
---name: ActiveShiftList: many
+-- name: ActiveShiftList :many
 Select * FROM Shifts
 WHERE isActive IS TRUE
 ORDER BY id;
@@ -40,38 +40,38 @@ ORDER BY id;
 DELETE FROM Shifts
 WHERE id = $1;
 
---name: AddShiftWorker: one
+-- name: AddShiftWorker :one
 INSERT INTO Shift_workers(
     shiftId, userId
 ) VALUES (
     $1, $2
 )
 RETURNING *;
---name: ShiftWorkersList: many
+-- name: ShiftWorkersList :many
 Select * FROM Shift_workers
 WHERE shiftId = $1  
-ORDER BY id;
+ORDER BY userId;
 -- name: DeleteShiftWorker :exec
 DELETE FROM Shift_workers
 WHERE shiftId = $1 AND userId = $2;
 
---name: AddShiftTask: one
-INSERT INTO Shift_workers(
+-- name: AddShiftTask :one
+INSERT INTO Shift_tasks(
     shiftId, taskId
 ) VALUES (
     $1, $2
 )
 RETURNING *;
----name: ShiftTasksList: many
+-- name: ShiftTasksList :many
 Select * FROM Shift_tasks
-WHERE shiftId = $2
-ORDER BY id;
+WHERE shiftId = $1
+ORDER BY taskId;
 -- name: DeleteShiftTask :exec
 DELETE FROM Shift_tasks
 WHERE shiftId = $1 AND taskId = $2;
 
 
---name: CreateTask: one
+-- name: CreateTask :one
 INSERT INTO Tasks(
     id, machineId, shiftId, frequency, taskPriority, description, createdBy, createdAt
 ) VALUES (
@@ -81,50 +81,50 @@ RETURNING *;
 -- name: DeleteTask :exec
 DELETE FROM Tasks
 WHERE id = $1;
---name: SetTaskStatusInProgress: one
+-- name: SetTaskStatusInProgress :exec
 UPDATE Tasks
 SET 
     status = 'inProgress',
-    NEW.movedInProgressAt = CURRENT_DATE
+    movedInProgressAt = CURRENT_DATE,
     movedInProgressBy = $2
 WHERE id = $1;
---name: SetTaskStatusFailed: one
+-- name: SetTaskStatusFailed :exec
 UPDATE Tasks
 SET 
     status = 'failed',
     comment = $2
 WHERE id = $1;
---name: SetTaskStatusCompleted: one
+-- name: SetTaskStatusCompleted :exec
 UPDATE Tasks
 SET 
     status = 'completed',
-    NEW.completedAt = CURRENT_DATE
+    completedAt = CURRENT_DATE,
     movedInProgressBy = $2
 WHERE id = $1;
---name: SetTaskStatusVerified: one
+-- name: SetTaskStatusVerified :exec
 UPDATE Tasks
 SET 
     status = 'verified',
-    NEW.verifiedAt = CURRENT_DATE
+    verifiedAt = CURRENT_DATE,
     movedInProgressBy = $2
 WHERE id = $1;
 
---name: CreateMachine: one
+-- name: CreateMachine :one
 INSERT INTO Machine(
     id, name, isRepairRequired, isActive 
 ) VALUES (
     $1, $2, $3, $4
 )
 RETURNING *;
---name: ChangeMachineActivity: exec
+-- name: ChangeMachineActivity :exec
 UPDATE Machine
 SET 
-    isActive = FALSE,
+    isActive = FALSE
 WHERE id = $1;
---name: MachineNeedRepair: exec
+-- name: MachineNeedRepair :exec
 UPDATE Machine
 SET 
-    isRepairRequired = TRUE,
+    isRepairRequired = TRUE
 WHERE id = $1;
 -- name: DeleteMachine :exec
 DELETE FROM Machine
