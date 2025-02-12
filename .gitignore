@@ -1,7 +1,7 @@
 #vscode
 .vscode/settings.json
 SM/configs/env/.env
-
+.vscode
 # http://www.gnu.org/software/automake
 
 Makefile.in
