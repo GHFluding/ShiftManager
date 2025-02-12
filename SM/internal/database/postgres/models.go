@@ -229,7 +229,7 @@ type Task struct {
 	Verifiedat        pgtype.Date
 	Completedby       pgtype.Int8
 	Completedat       pgtype.Date
-	Status            NullTaskstatus
+	Status            Taskstatus
 	Comment           pgtype.Text
 	Movedinprogressby pgtype.Int8
 	Movedinprogressat pgtype.Date

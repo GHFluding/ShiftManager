@@ -1,7 +1,11 @@
 version: "2"
 sql:
   - engine: "postgresql"
-    queries: "query.sql"
+    queries: 
+    - "machine_query.sql"
+    - "user_query.sql"
+    - "shift_query.sql"
+    - "task_query.sql"
     schema: "schema.sql"
     gen:
       go:

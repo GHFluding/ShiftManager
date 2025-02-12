@@ -34,22 +34,22 @@ type Storage struct {
 
 // MustLoad loads the configuration from environment variables
 func MustLoad() *Config {
-	err := godotenv.Load("../..//configs/env/.env")
+	err := godotenv.Load("../../configs/env/.env")
 	if err != nil {
 		log.Fatalf("Error loading .env file")
 	}
-	env := getEnv("ENV", "local")
-	storagePort, err := strconv.Atoi(getEnv("DB_PORT", "5432"))
+	env := getEnv("ENV")
+	storagePort, err := strconv.Atoi(getEnv("DB_PORT"))
 	if err != nil {
 		log.Fatalf("invalid DB_PORT value: %v", err)
 	}
 
-	httpTimeout, err := time.ParseDuration(getEnv("HTTP_SERVER_TIMEOUT", "5s"))
+	httpTimeout, err := time.ParseDuration(getEnv("HTTP_SERVER_TIMEOUT"))
 	if err != nil {
 		log.Fatalf("invalid HTTP_SERVER_TIMEOUT value: %v", err)
 	}
 
-	httpIdleTimeout, err := time.ParseDuration(getEnv("HTTP_SERVER_IDLE_TIMEOUT", "60s"))
+	httpIdleTimeout, err := time.ParseDuration(getEnv("HTTP_SERVER_IDLE_TIMEOUT"))
 	if err != nil {
 		log.Fatalf("invalid HTTP_SERVER_IDLE_TIMEOUT value: %v", err)
 	}
@@ -57,14 +57,14 @@ func MustLoad() *Config {
 	cfg := &Config{
 		Env: env,
 		Storage: Storage{
-			Host:     getEnv("DB_HOST", "postgres"),
+			Host:     getEnv("DB_HOST"),
 			Port:     storagePort,
-			User:     getEnv("DB_USER", "postgres"),
-			Password: getEnv("DB_PASSWORD", "postgres"),
-			DBName:   getEnv("DB_NAME", "storage"),
+			User:     getEnv("DB_USER"),
+			Password: getEnv("DB_PASSWORD"),
+			DBName:   getEnv("DB_NAME"),
 		},
 		HTTPServer: HTTPServer{
-			Address:     getEnv("HTTP_SERVER_ADDRESS", "localhost:8082"),
+			Address:     getEnv("HTTP_SERVER_ADDRESS"),
 			TimeOut:     httpTimeout,
 			IdleTimeOut: httpIdleTimeout,
 		},
@@ -75,9 +75,10 @@ func MustLoad() *Config {
 	return cfg
 }
 
-func getEnv(key, defaultValue string) string {
+func getEnv(key string) string {
 	if value, exists := os.LookupEnv(key); exists {
 		return value
 	}
-	return defaultValue
+	log.Fatalf("No value in Env")
+	return ""
 }
