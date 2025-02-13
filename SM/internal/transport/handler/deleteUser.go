@@ -3,28 +3,41 @@ package handler
 import (
 	"context"
 	"errors"
+	"sm/internal/utils/handler_utils"
+	"sm/internal/utils/logger"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-func DeleteUser(p Params) gin.HandlerFunc {
+// DeleteUser Delete user by id.
+// @Summary      Delete user
+// @Description   Delete a user:id from the database.
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        id   path      int64 true "User id"
+// @Success      204  {object} gin.H "No connection"
+// @Failure      400  {object} gin.H "invalid data"
+// @Failure      404  {object}  gin.H "missing id"
+// @Router       /api/users/{id} [delete]
+func DeleteUser(p handler_utils.Params) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		const handlerName = "get request with user_list handler"
-		reqParams := createStartData(c)
-		requestLogger(p.log, reqParams, handlerName, "Start", nil)
+		reqParams := handler_utils.CreateStartData(c)
+		logger.RequestLogger(p.Log, reqParams, handlerName, "Start", nil)
 		userIdFromPath := c.Param("id")
 		userId, err := strconv.Atoi(userIdFromPath)
 		if err != nil {
 			err := errors.New("invalid user id")
-			requestLogger(p.log, reqParams, handlerName, "Error", err)
+			logger.RequestLogger(p.Log, reqParams, handlerName, "Error", err)
 			return
 		}
-		err = p.db.DeleteUser(context.Background(), int64(userId))
+		err = p.DB.DeleteUser(context.Background(), int64(userId))
 		if err != nil {
-			requestLogger(p.log, reqParams, handlerName, "Error", err)
+			logger.RequestLogger(p.Log, reqParams, handlerName, "Error", err)
 			return
 		}
-		requestLogger(p.log, reqParams, handlerName, "Successfully", nil)
+		logger.RequestLogger(p.Log, reqParams, handlerName, "Successfully", nil)
 	}
 }
