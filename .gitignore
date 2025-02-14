@@ -1,6 +1,9 @@
 #vscode
 .vscode/settings.json
 SM/configs/env/.env
+.vscode
+vendor
+SM/docs.go
 
 # http://www.gnu.org/software/automake
 

@@ -1,0 +1,126 @@
+basePath: /api
+consumes:
+- application/json
+definitions:
+  gin.H:
+    additionalProperties: {}
+    type: object
+  postgres.User:
+    properties:
+      bitrixid:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+      role:
+        $ref: '#/definitions/postgres.Userrole'
+    type: object
+  postgres.Userrole:
+    enum:
+    - engineer
+    - worker
+    - master
+    - manager
+    - admin
+    type: string
+    x-enum-varnames:
+    - UserroleEngineer
+    - UserroleWorker
+    - UserroleMaster
+    - UserroleManager
+    - UserroleAdmin
+host: localhost:8080
+info:
+  contact:
+    email: example@example.com
+    name: API Support
+    url: http://81.177.220.96/
+  description: API for managing shifts and adding tasks
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://example.com/terms/
+  title: Shift manager api
+  version: "1.0"
+paths:
+  /api/students:
+    get:
+      description: Get all users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of users
+          schema:
+            items:
+              $ref: '#/definitions/postgres.User'
+            type: array
+        "500":
+          description: Server error
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Get list of users
+  /api/students/{role}:
+    get:
+      consumes:
+      - application/json
+      description: Return list of users with role.
+      parameters:
+      - description: Users role
+        format: id
+        in: path
+        name: role
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of users with role
+          schema:
+            items:
+              $ref: '#/definitions/postgres.User'
+            type: array
+        "400":
+          description: invalid data
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Get list of users with role
+      tags:
+      - students
+  /api/users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a user:id from the database.
+      parameters:
+      - description: User id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No connection
+          schema:
+            $ref: '#/definitions/gin.H'
+        "400":
+          description: invalid data
+          schema:
+            $ref: '#/definitions/gin.H'
+        "404":
+          description: missing id
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Delete user
+      tags:
+      - users
+produces:
+- application/json
+schemes:
+- http
+- https
+swagger: "2.0"
