@@ -83,31 +83,16 @@ func ConvertToOut(dest interface{}) (interface{}, error) {
 	}
 }
 
-func ListConvert(dest []interface{}) ([]interface{}, error) {
+/*
+func ListConvert(users []interface{}) ([]interface{}, error) {
 	var usersOut []interface{}
-	inpSlice := dest
-	switch inp := dest[0].(type) {
-	case postgres.User:
-		{
-			for i := range inp {
-				userOut, err := ConvertToOut(inp[i])
-				usersOut = append(usersOut, userOut)
-				if err != nil {
-					return nil, err
-				}
-			}
-			return usersOut, nil
-		}
-	default:
-		{
-			for i := range inp {
-				userOut, err := ConvertToOut(inp[i])
-				usersOut = append(usersOut, userOut)
-				if err != nil {
-					return nil, err
-				}
-			}
-			return usersOut, nil
+	for i := range users {
+		userOut, err := ConvertToOut(users[i])
+		usersOut = append(usersOut, userOut)
+		if err != nil {
+			return nil, err
 		}
 	}
+	return usersOut, nil
 }
+*/

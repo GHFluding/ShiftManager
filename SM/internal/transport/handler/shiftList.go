@@ -35,7 +35,7 @@ func GetShiftList(p handler_utils.Params) gin.HandlerFunc {
 
 func GetActiveShiftList(p handler_utils.Params) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		const handlerName = "get request with shift_list handler"
+		const handlerName = "get request with active_shift_list handler"
 		reqParams := handler_utils.CreateStartData(c)
 		logger.RequestLogger(p.Log, reqParams, handlerName, "Start", nil)
 		shifts, err := p.DB.ActiveShiftList(context.Background())
