@@ -1,5 +1,7 @@
 package handler_output
 
+import "sm/internal/database/postgres"
+
 type UserOutput struct {
 	ID       int64
 	Bitrixid int64
@@ -39,4 +41,11 @@ type MachineOutput struct {
 	Name             string
 	Isrepairrequired bool
 	Isactive         bool
+}
+
+type OutputTypes interface {
+	MachineOutput | TaskOutput | ShiftOutput | UserOutput | postgres.ShiftWorker | postgres.ShiftTask
+}
+type InputTypes interface {
+	postgres.Machine | postgres.User | postgres.Shift | postgres.ShiftWorker | postgres.ShiftTask
 }

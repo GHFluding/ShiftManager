@@ -21,7 +21,7 @@ func GetShiftList(p handler_utils.Params) gin.HandlerFunc {
 			logger.RequestLogger(p.Log, reqParams, handlerName, "Error", err)
 			return
 		}
-		shiftsOut, err := shiftsListCovert(shifts)
+		shiftsOut, err := handler_output.ConvertListToOut[postgres.Shift, handler_output.ShiftOutput](shifts)
 		if err != nil {
 			logger.RequestLogger(p.Log, reqParams, handlerName, "Error", err)
 			return
@@ -43,7 +43,7 @@ func GetActiveShiftList(p handler_utils.Params) gin.HandlerFunc {
 			logger.RequestLogger(p.Log, reqParams, handlerName, "Error", err)
 			return
 		}
-		shiftsOut, err := shiftsListCovert(shifts)
+		shiftsOut, err := handler_output.ConvertListToOut[postgres.Shift, handler_output.ShiftOutput](shifts)
 		if err != nil {
 			logger.RequestLogger(p.Log, reqParams, handlerName, "Error", err)
 			return
@@ -53,16 +53,4 @@ func GetActiveShiftList(p handler_utils.Params) gin.HandlerFunc {
 			"shifts": shiftsOut,
 		})
 	}
-}
-
-func shiftsListCovert(shifts []postgres.Shift) ([]interface{}, error) {
-	var shiftsOut []interface{}
-	for i := range shifts {
-		userOut, err := handler_output.ConvertToOut(shifts[i])
-		shiftsOut = append(shiftsOut, userOut)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return shiftsOut, nil
 }

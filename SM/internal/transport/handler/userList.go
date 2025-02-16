@@ -29,7 +29,7 @@ func GetUserList(p handler_utils.Params) gin.HandlerFunc {
 			logger.RequestLogger(p.Log, reqParams, handlerName, "Error", err)
 			return
 		}
-		usersOut, err := usersListCovert(users)
+		usersOut, err := handler_output.ConvertListToOut[postgres.User, handler_output.UserOutput](users)
 		if err != nil {
 			logger.RequestLogger(p.Log, reqParams, handlerName, "Error", err)
 			return
@@ -68,7 +68,7 @@ func GetUserListByRole(p handler_utils.Params) gin.HandlerFunc {
 			logger.RequestLogger(p.Log, reqParams, handlerName, "Error", err)
 			return
 		}
-		usersOut, err := usersListCovert(users)
+		usersOut, err := handler_output.ConvertListToOut[postgres.User, handler_output.UserOutput](users)
 		if err != nil {
 			logger.RequestLogger(p.Log, reqParams, handlerName, "Error", err)
 			return
@@ -78,16 +78,4 @@ func GetUserListByRole(p handler_utils.Params) gin.HandlerFunc {
 			userRoleParam: usersOut,
 		})
 	}
-}
-
-func usersListCovert(users []postgres.User) ([]interface{}, error) {
-	var usersOut []interface{}
-	for i := range users {
-		userOut, err := handler_output.ConvertToOut(users[i])
-		usersOut = append(usersOut, userOut)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return usersOut, nil
 }
