@@ -11,6 +11,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetShiftTaskList Return list of shifts task by shift id.
+// @Summary      Get list of shifts task by shift id
+// @Description  Return list of shifts task by shift id.
+// @Tags         shift task
+// @Accept       json
+// @Produce      json
+// @Param        id   path      int64  true  "Shift id" format(id)
+// @Success 	 200 {array} postgres.ShiftTask "List of task by shift id"
+// @Failure      400  {object}  gin.H "invalid data"
+// @Router       /api/users/{id} [get]
 func GetShiftTaskList(p handler_utils.Params) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		const handlerName = "get request with shift_task_list handler"

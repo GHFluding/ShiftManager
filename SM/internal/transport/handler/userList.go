@@ -18,7 +18,7 @@ import (
 // @Produce json
 // @Success 200 {array} handler_output.UserOutput "List of users"
 // @Failure 500 {object} gin.H "Server error"
-// @Router /api/students [get]
+// @Router /api/users [get]
 func GetUserList(p handler_utils.Params) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		const handlerName = "get request with user_list handler"
@@ -50,7 +50,7 @@ func GetUserList(p handler_utils.Params) gin.HandlerFunc {
 // @Param        role   path      string  true  "Users role" format(id)
 // @Success 	 200 {array} handler_output.UserOutput "List of users with role"
 // @Failure      400  {object}  gin.H "invalid data"
-// @Router       /api/students/{role} [get]
+// @Router       /api/users/{role} [get]
 func GetUserListByRole(p handler_utils.Params) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		const handlerName = "get request with user_list_by_id handler"

@@ -68,7 +68,7 @@ func ConvertDataToOut[T InputTypes, O OutputTypes](dest T) (O, error) {
 	}
 }
 
-// This function convert slice to standard type
+// This function convert slice items to standard type
 func ConvertListToOut[T InputTypes, O OutputTypes](input []T) ([]O, error) {
 	var sliceOut []O
 	for _, item := range input {

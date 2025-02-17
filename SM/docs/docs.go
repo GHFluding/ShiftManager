@@ -30,20 +30,67 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/students": {
-            "get": {
-                "description": "Get all users",
+        "/api/machine/{id}": {
+            "put": {
+                "description": "change machine status to need repair machine:id from the database.",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Get list of users",
+                "tags": [
+                    "machine"
+                ],
+                "summary": "change machine status to need repair",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Machine id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No connection",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "400": {
+                        "description": "invalid data",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    },
+                    "404": {
+                        "description": "missing id",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/shifts": {
+            "get": {
+                "description": "get out shifts that are active.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "shifts"
+                ],
+                "summary": "get out shifts that are active",
                 "responses": {
                     "200": {
-                        "description": "List of users",
+                        "description": "List of active shifts",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/postgres.User"
+                                "$ref": "#/definitions/handler_output.ShiftOutput"
                             }
                         }
                     },
@@ -56,9 +103,35 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/students/{role}": {
+        "/api/users": {
             "get": {
-                "description": "Return list of users with role.",
+                "description": "Get all users",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get list of users",
+                "responses": {
+                    "200": {
+                        "description": "List of users",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handler_output.UserOutput"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/{id}": {
+            "get": {
+                "description": "Return list of shift workers  by shift id.",
                 "consumes": [
                     "application/json"
                 ],
@@ -66,26 +139,26 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "students"
+                    "shift worker"
                 ],
-                "summary": "Get list of users with role",
+                "summary": "Get list of shift workers  by shift id",
                 "parameters": [
                     {
-                        "type": "string",
+                        "type": "integer",
                         "format": "id",
-                        "description": "Users role",
-                        "name": "role",
+                        "description": "Shift id",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of users with role",
+                        "description": "List of shift workers by shift id",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/postgres.User"
+                                "$ref": "#/definitions/postgres.ShiftWorker"
                             }
                         }
                     },
@@ -96,9 +169,7 @@ const docTemplate = `{
                         }
                     }
                 }
-            }
-        },
-        "/api/users/{id}": {
+            },
             "delete": {
                 "description": "Delete a user:id from the database.",
                 "consumes": [
@@ -141,6 +212,48 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/users/{role}": {
+            "get": {
+                "description": "Return list of users with role.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "students"
+                ],
+                "summary": "Get list of users with role",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "id",
+                        "description": "Users role",
+                        "name": "role",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of users with role",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handler_output.UserOutput"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "invalid data",
+                        "schema": {
+                            "$ref": "#/definitions/gin.H"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -148,7 +261,30 @@ const docTemplate = `{
             "type": "object",
             "additionalProperties": {}
         },
-        "postgres.User": {
+        "handler_output.ShiftOutput": {
+            "type": "object",
+            "properties": {
+                "createdat": {
+                    "type": "string"
+                },
+                "deactivatedat": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "isactive": {
+                    "type": "boolean"
+                },
+                "machineid": {
+                    "type": "integer"
+                },
+                "shiftMaster": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler_output.UserOutput": {
             "type": "object",
             "properties": {
                 "bitrixid": {
@@ -161,26 +297,31 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "role": {
-                    "$ref": "#/definitions/postgres.Userrole"
+                    "type": "string"
                 }
             }
         },
-        "postgres.Userrole": {
-            "type": "string",
-            "enum": [
-                "engineer",
-                "worker",
-                "master",
-                "manager",
-                "admin"
-            ],
-            "x-enum-varnames": [
-                "UserroleEngineer",
-                "UserroleWorker",
-                "UserroleMaster",
-                "UserroleManager",
-                "UserroleAdmin"
-            ]
+        "postgres.ShiftTask": {
+            "type": "object",
+            "properties": {
+                "shiftid": {
+                    "type": "integer"
+                },
+                "taskid": {
+                    "type": "integer"
+                }
+            }
+        },
+        "postgres.ShiftWorker": {
+            "type": "object",
+            "properties": {
+                "shiftid": {
+                    "type": "integer"
+                },
+                "userid": {
+                    "type": "integer"
+                }
+            }
         }
     }
 }`

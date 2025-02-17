@@ -10,6 +10,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// ChangeMachineToRepair change machine status to need repair.
+// @Summary     change machine status to need repair
+// @Description   change machine status to need repair machine:id from the database.
+// @Tags         machine
+// @Accept       json
+// @Produce      json
+// @Param        id   path      int64 true "Machine id"
+// @Success      204  {object} gin.H "No connection"
+// @Failure      400  {object} gin.H "invalid data"
+// @Failure      404  {object}  gin.H "missing id"
+// @Router       /api/machine/{id} [put]
 func ChangeMachineToRepair(p handler_utils.Params) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		const handlerName = "get request with machine_to_repair handler"

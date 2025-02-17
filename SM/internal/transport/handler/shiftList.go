@@ -11,6 +11,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetActiveShiftList get all shifts.
+// @Summary    get all shifts.
+// @Description    get all shifts.
+// @Tags         shifts
+// @Produce json
+// @Success 200 {array} handler_output.ShiftOutput "List of shifts"
+// @Failure 500 {object} gin.H "Server error"
+// @Router /api/shifts [get]
 func GetShiftList(p handler_utils.Params) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		const handlerName = "get request with shift_list handler"
@@ -33,6 +41,14 @@ func GetShiftList(p handler_utils.Params) gin.HandlerFunc {
 	}
 }
 
+// GetActiveShiftList get out shifts that are active.
+// @Summary    get out shifts that are active
+// @Description   get out shifts that are active.
+// @Tags         shifts
+// @Produce json
+// @Success 200 {array} handler_output.ShiftOutput "List of active shifts"
+// @Failure 500 {object} gin.H "Server error"
+// @Router /api/shifts [get]
 func GetActiveShiftList(p handler_utils.Params) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		const handlerName = "get request with active_shift_list handler"
