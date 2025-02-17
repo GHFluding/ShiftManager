@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"sm/internal/database/postgres"
 	"sm/internal/utils/handler_utils"
+	handler_output "sm/internal/utils/handler_utils/output"
 	"sm/internal/utils/logger"
 
 	"github.com/gin-gonic/gin"
@@ -14,7 +16,7 @@ import (
 // @Summary Get list of users
 // @Description Get all users
 // @Produce json
-// @Success 200 {array} postgres.User "List of users"
+// @Success 200 {array} handler_output.UserOutput "List of users"
 // @Failure 500 {object} gin.H "Server error"
 // @Router /api/students [get]
 func GetUserList(p handler_utils.Params) gin.HandlerFunc {
@@ -27,9 +29,14 @@ func GetUserList(p handler_utils.Params) gin.HandlerFunc {
 			logger.RequestLogger(p.Log, reqParams, handlerName, "Error", err)
 			return
 		}
+		usersOut, err := handler_output.ConvertListToOut[postgres.User, handler_output.UserOutput](users)
+		if err != nil {
+			logger.RequestLogger(p.Log, reqParams, handlerName, "Error", err)
+			return
+		}
 		logger.RequestLogger(p.Log, reqParams, handlerName, "Successfully", nil)
 		c.JSON(http.StatusOK, gin.H{
-			"users": users,
+			"users": usersOut,
 		})
 	}
 }
@@ -41,7 +48,7 @@ func GetUserList(p handler_utils.Params) gin.HandlerFunc {
 // @Accept       json
 // @Produce      json
 // @Param        role   path      string  true  "Users role" format(id)
-// @Success 	 200 {array} postgres.User "List of users with role"
+// @Success 	 200 {array} handler_output.UserOutput "List of users with role"
 // @Failure      400  {object}  gin.H "invalid data"
 // @Router       /api/students/{role} [get]
 func GetUserListByRole(p handler_utils.Params) gin.HandlerFunc {
@@ -61,8 +68,14 @@ func GetUserListByRole(p handler_utils.Params) gin.HandlerFunc {
 			logger.RequestLogger(p.Log, reqParams, handlerName, "Error", err)
 			return
 		}
+		usersOut, err := handler_output.ConvertListToOut[postgres.User, handler_output.UserOutput](users)
+		if err != nil {
+			logger.RequestLogger(p.Log, reqParams, handlerName, "Error", err)
+			return
+		}
+		logger.RequestLogger(p.Log, reqParams, handlerName, "Successfully", nil)
 		c.JSON(http.StatusOK, gin.H{
-			userRoleParam: users,
+			userRoleParam: usersOut,
 		})
 	}
 }
