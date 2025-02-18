@@ -1,5 +1,5 @@
 // convertOutputData.go
-package handler_output
+package services
 
 import (
 	"errors"
@@ -7,17 +7,17 @@ import (
 )
 
 // convert data type to output. For Example pgtype.Int8 to int64
-func ConvertDataToOut[T InputTypes, O OutputTypes](dest T) (O, error) {
+func convertDataToTransport[T InputTypes, O OutputTypes](dest T) (O, error) {
 	switch inp := any(dest).(type) {
 	case postgres.User:
-		var out UserOutput
+		var out UserDTO
 		out.ID = inp.ID
 		out.Bitrixid = inp.ID
 		out.Name = inp.Name
 		out.Role = string(inp.Role)
 		return any(out).(O), nil
 	case postgres.Shift:
-		var out ShiftOutput
+		var out ShiftDTO
 		out.ID = inp.ID
 		out.Machineid = inp.Machineid
 		out.ShiftMaster = inp.ShiftMaster
@@ -26,11 +26,17 @@ func ConvertDataToOut[T InputTypes, O OutputTypes](dest T) (O, error) {
 		out.Deactivatedat = inp.Deactivatedat.Time.String()
 		return any(out).(O), nil
 	case postgres.ShiftTask:
-		return any(inp).(O), nil
+		var out ShiftTaskDTO
+		out.Shiftid = inp.Shiftid
+		out.Taskid = inp.Taskid
+		return any(out).(O), nil
 	case postgres.ShiftWorker:
-		return any(inp).(O), nil
+		var out ShiftWorkerDTO
+		out.Shiftid = inp.Shiftid
+		out.Userid = inp.Userid
+		return any(out).(O), nil
 	case postgres.Task:
-		var out TaskOutput
+		var out TaskDTO
 		out.ID = inp.ID
 		out.Machineid = inp.Machineid
 		if inp.Shiftid.Valid {
@@ -57,7 +63,7 @@ func ConvertDataToOut[T InputTypes, O OutputTypes](dest T) (O, error) {
 		out.Movedinprogressat = inp.Movedinprogressat.Time.String()
 		return any(out).(O), nil
 	case postgres.Machine:
-		var out MachineOutput
+		var out MachineDTO
 		out.ID = inp.ID
 		out.Isactive = inp.Isactive.Bool
 		out.Isrepairrequired = inp.Isrepairrequired.Bool
@@ -69,10 +75,10 @@ func ConvertDataToOut[T InputTypes, O OutputTypes](dest T) (O, error) {
 }
 
 // This function convert slice items to standard type
-func ConvertListToOut[T InputTypes, O OutputTypes](input []T) ([]O, error) {
+func convertListToTransport[T InputTypes, O OutputTypes](input []T) ([]O, error) {
 	var sliceOut []O
 	for _, item := range input {
-		dataOut, err := ConvertDataToOut[T, O](item)
+		dataOut, err := convertDataToTransport[T, O](item)
 		if err != nil {
 			return nil, err
 		}

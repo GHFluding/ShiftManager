@@ -1,8 +1,9 @@
 package handler
 
 import (
-	"context"
 	"errors"
+	"log/slog"
+	"sm/internal/services"
 	"sm/internal/utils/handler_utils"
 	"sm/internal/utils/logger"
 	"strconv"
@@ -21,23 +22,23 @@ import (
 // @Failure      400  {object} gin.H "invalid data"
 // @Failure      404  {object}  gin.H "missing id"
 // @Router       /api/machine/{id} [put]
-func ChangeMachineToRepair(p handler_utils.Params) gin.HandlerFunc {
+func ChangeMachineToRepair(log *slog.Logger, sp *services.ServicesParams) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		const handlerName = "get request with machine_to_repair handler"
 		reqParams := handler_utils.CreateStartData(c)
-		logger.RequestLogger(p.Log, reqParams, handlerName, "Start", nil)
+		logger.RequestLogger(log, reqParams, handlerName, "Start", nil)
 		machineIdFromPath := c.Param("id")
 		machineId, err := strconv.Atoi(machineIdFromPath)
 		if err != nil {
 			err := errors.New("invalid user id")
-			logger.RequestLogger(p.Log, reqParams, handlerName, "Error", err)
+			logger.RequestLogger(log, reqParams, handlerName, "Error", err)
 			return
 		}
-		err = p.DB.MachineNeedRepair(context.Background(), int64(machineId))
-		if err != nil {
-			logger.RequestLogger(p.Log, reqParams, handlerName, "Error", err)
+		ok := services.MachineNeedRepair(sp, int64(machineId))
+		if !ok {
+			logger.RequestLogger(log, reqParams, handlerName, "Error", errors.New("failed to change status"))
 			return
 		}
-		logger.RequestLogger(p.Log, reqParams, handlerName, "Successfully", nil)
+		logger.RequestLogger(log, reqParams, handlerName, "Successfully", nil)
 	}
 }

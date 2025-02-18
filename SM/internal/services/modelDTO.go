@@ -1,15 +1,15 @@
-package handler_output
+package services
 
 import "sm/internal/database/postgres"
 
-type UserOutput struct {
+type UserDTO struct {
 	ID       int64
 	Bitrixid int64
 	Name     string
 	Role     string
 }
 
-type ShiftOutput struct {
+type ShiftDTO struct {
 	ID            int64
 	Machineid     int64
 	ShiftMaster   int64
@@ -17,7 +17,7 @@ type ShiftOutput struct {
 	Isactive      bool
 	Deactivatedat string
 }
-type TaskOutput struct {
+type TaskDTO struct {
 	ID                int64
 	Machineid         int64
 	Shiftid           int64
@@ -36,15 +36,24 @@ type TaskOutput struct {
 	Movedinprogressat string
 }
 
-type MachineOutput struct {
+type MachineDTO struct {
 	ID               int64
 	Name             string
 	Isrepairrequired bool
 	Isactive         bool
 }
 
+type ShiftWorkerDTO struct {
+	Shiftid int64
+	Userid  int64
+}
+type ShiftTaskDTO struct {
+	Shiftid int64
+	Taskid  int64
+}
+
 type OutputTypes interface {
-	MachineOutput | TaskOutput | ShiftOutput | UserOutput | postgres.ShiftWorker | postgres.ShiftTask
+	MachineDTO | TaskDTO | ShiftDTO | UserDTO | ShiftWorkerDTO | ShiftTaskDTO
 }
 type InputTypes interface {
 	postgres.Machine | postgres.User | postgres.Shift | postgres.ShiftWorker | postgres.ShiftTask

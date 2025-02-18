@@ -5,9 +5,9 @@ import (
 	"sm/internal/config"
 	"sm/internal/database"
 	"sm/internal/database/postgres"
+	"sm/internal/services"
 	"sm/internal/transport/handler"
 	"sm/internal/transport/middleware"
-	"sm/internal/utils/handler_utils"
 	"sm/internal/utils/logger"
 
 	"github.com/gin-gonic/gin"
@@ -47,28 +47,29 @@ func Run() {
 	}
 
 	db := postgres.New(dbpool)
+	services.NewServicesParams(db, log)
 
 	r := gin.Default()
 	r.Use(middleware.RequestId())
 
-	handlerParams := handler_utils.CreateParams(db, log)
+	handlerParams := services.NewServicesParams(db, log)
 
 	usersGroup := r.Group("/api/users")
 	{
-		usersGroup.GET("/", handler.GetUserList(handlerParams))
-		usersGroup.GET("/:role", handler.GetUserListByRole(handlerParams))
-		usersGroup.DELETE("/:id", handler.DeleteUser(handlerParams))
+		usersGroup.GET("/", handler.GetUserList(log, handlerParams))
+		usersGroup.GET("/:role", handler.GetUserListByRole(log, handlerParams))
+		usersGroup.DELETE("/:id", handler.DeleteUser(log, handlerParams))
 	}
 	machineGroup := r.Group("/api/machine")
 	{
-		machineGroup.PUT("/:id", handler.ChangeMachineToRepair(handlerParams))
+		machineGroup.PUT("/:id", handler.ChangeMachineToRepair(log, handlerParams))
 	}
 	shiftGroup := r.Group("/api/shifts")
 	{
-		shiftGroup.GET("/", handler.GetShiftList(handlerParams))
-		shiftGroup.GET("/active/", handler.GetActiveShiftList(handlerParams))
-		shiftGroup.GET("/tasks/", handler.GetShiftTaskList(handlerParams))
-		shiftGroup.GET("/workers/", handler.GetShiftWorkersList(handlerParams))
+		shiftGroup.GET("/", handler.GetShiftList(log, handlerParams))
+		shiftGroup.GET("/active/", handler.GetActiveShiftList(log, handlerParams))
+		shiftGroup.GET("/tasks/", handler.GetShiftTaskList(log, handlerParams))
+		shiftGroup.GET("/workers/", handler.GetShiftWorkersList(log, handlerParams))
 	}
 
 }
