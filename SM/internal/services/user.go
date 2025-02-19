@@ -16,27 +16,27 @@ func DeleteUser(sp *ServicesParams, userid int64) bool {
 }
 
 func UsersList(sp *ServicesParams) ([]User, error) {
-	var UsersToOUT []User
-	users, err := sp.db.UsersList(context.Background())
+	var users []User
+	usersDB, err := sp.db.UsersList(context.Background())
 	if err != nil {
 		sp.log.Info("Failed to retrieve users from db", logger.ErrToAttr(err))
-		return UsersToOUT, err
+		return users, err
 	}
-	for _, i := range users {
-		UsersToOUT = append(UsersToOUT, convertUser(i))
+	for _, i := range usersDB {
+		users = append(users, convertUser(i))
 	}
-	return UsersToOUT, nil
+	return users, nil
 }
 
 func UsersListByRole(sp *ServicesParams, role postgres.Userrole) ([]User, error) {
-	var UsersToOUT []User
-	users, err := sp.db.UsersListByRole(context.Background(), role)
+	var users []User
+	usersDB, err := sp.db.UsersListByRole(context.Background(), role)
 	if err != nil {
 		sp.log.Info("Failed to retrieve users from db", logger.ErrToAttr(err))
-		return UsersToOUT, err
+		return users, err
 	}
-	for _, i := range users {
-		UsersToOUT = append(UsersToOUT, convertUser(i))
+	for _, i := range usersDB {
+		users = append(users, convertUser(i))
 	}
-	return UsersToOUT, nil
+	return users, nil
 }

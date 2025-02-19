@@ -6,28 +6,28 @@ import (
 )
 
 func ShiftWorkersList(sp *ServicesParams, shiftid int64) ([]ShiftWorker, error) {
-	var ShiftsWorkersToOut []ShiftWorker
-	shiftWorkers, err := sp.db.ShiftWorkersList(context.Background(), shiftid)
+	var ShiftsWorkers []ShiftWorker
+	shiftWorkersDB, err := sp.db.ShiftWorkersList(context.Background(), shiftid)
 	if err != nil {
 		sp.log.Info("Failed to convert shift workers from db", logger.ErrToAttr(err))
-		return ShiftsWorkersToOut, err
+		return ShiftsWorkers, err
 	}
 
-	for _, i := range shiftWorkers {
-		ShiftsWorkersToOut = append(ShiftsWorkersToOut, convertShiftWorker(i))
+	for _, i := range shiftWorkersDB {
+		ShiftsWorkers = append(ShiftsWorkers, convertShiftWorker(i))
 	}
-	return ShiftsWorkersToOut, nil
+	return ShiftsWorkers, nil
 }
 
 func ShiftTasksList(sp *ServicesParams, shiftid int64) ([]ShiftTask, error) {
-	var ShiftTaskToOut []ShiftTask
-	shiftTasks, err := sp.db.ShiftTasksList(context.Background(), shiftid)
+	var shiftTask []ShiftTask
+	shiftTasksDB, err := sp.db.ShiftTasksList(context.Background(), shiftid)
 	if err != nil {
 		sp.log.Info("Failed to convert shift tasks from db", logger.ErrToAttr(err))
-		return ShiftTaskToOut, err
+		return shiftTask, err
 	}
-	for _, i := range shiftTasks {
-		ShiftTaskToOut = append(ShiftTaskToOut, convertShiftTask(i))
+	for _, i := range shiftTasksDB {
+		shiftTask = append(shiftTask, convertShiftTask(i))
 	}
-	return ShiftTaskToOut, nil
+	return shiftTask, nil
 }

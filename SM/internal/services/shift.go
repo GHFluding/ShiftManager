@@ -7,29 +7,29 @@ import (
 
 func ShiftList(sp *ServicesParams) ([]Shift, error) {
 	//here for return blank struct if error
-	var ShiftsToOut []Shift
-	shifts, err := sp.db.ShiftList(context.Background())
+	var shifts []Shift
+	shiftsDB, err := sp.db.ShiftList(context.Background())
 	if err != nil {
 		sp.log.Info("Failed to convert shifts from db", logger.ErrToAttr(err))
-		return ShiftsToOut, err
+		return shifts, err
 	}
-	for _, i := range shifts {
-		ShiftsToOut = append(ShiftsToOut, convertShift(i))
+	for _, i := range shiftsDB {
+		shifts = append(shifts, convertShift(i))
 	}
-	return ShiftsToOut, nil
+	return shifts, nil
 }
 
 func ActiveShiftList(sp *ServicesParams) ([]Shift, error) {
 	//here for return blank struct if error
-	var ShiftsToOut []Shift
+	var shiftsToOut []Shift
 	shifts, err := sp.db.ActiveShiftList(context.Background())
 	if err != nil {
 		sp.log.Info("Failed to convert shifts from db", logger.ErrToAttr(err))
-		return ShiftsToOut, err
+		return shiftsToOut, err
 	}
 	for _, i := range shifts {
-		ShiftsToOut = append(ShiftsToOut, convertShift(i))
+		shiftsToOut = append(shiftsToOut, convertShift(i))
 	}
 
-	return ShiftsToOut, nil
+	return shiftsToOut, nil
 }
