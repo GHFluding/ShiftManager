@@ -34,13 +34,13 @@ func GetShiftTaskList(log *slog.Logger, sp *services.ServicesParams) gin.Handler
 			logger.RequestLogger(log, reqParams, handlerName, "Error", err)
 			return
 		}
-		shiftTasksService := services.ShiftTasksList(sp, int64(shiftid))
-		if !shiftTasksService.Valid {
+		shiftTasksService, err := services.ShiftTasksList(sp, int64(shiftid))
+		if err != nil {
 			return
 		}
 		logger.RequestLogger(log, reqParams, handlerName, "Successfully", nil)
 		c.JSON(http.StatusOK, gin.H{
-			"Tasks": shiftTasksService.TasksListDTO,
+			"Tasks": shiftTasksService,
 		})
 	}
 }

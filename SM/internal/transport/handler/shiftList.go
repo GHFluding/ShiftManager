@@ -23,13 +23,13 @@ func GetShiftList(log *slog.Logger, sp *services.ServicesParams) gin.HandlerFunc
 		const handlerName = "get request with shift_list handler"
 		reqParams := handler_utils.CreateStartData(c)
 		logger.RequestLogger(log, reqParams, handlerName, "Start", nil)
-		shiftsService := services.ShiftList(sp)
-		if !shiftsService.Valid {
+		shiftsService, err := services.ShiftList(sp)
+		if err != nil {
 			return
 		}
 		logger.RequestLogger(log, reqParams, handlerName, "Successfully", nil)
 		c.JSON(http.StatusOK, gin.H{
-			"shifts": shiftsService.ShiftListDTO,
+			"shifts": shiftsService,
 		})
 	}
 }
@@ -47,13 +47,13 @@ func GetActiveShiftList(log *slog.Logger, sp *services.ServicesParams) gin.Handl
 		const handlerName = "get request with active_shift_list handler"
 		reqParams := handler_utils.CreateStartData(c)
 		logger.RequestLogger(log, reqParams, handlerName, "Start", nil)
-		shiftsService := services.ActiveShiftList(sp)
-		if !shiftsService.Valid {
+		shiftsService, err := services.ActiveShiftList(sp)
+		if err != nil {
 			return
 		}
 		logger.RequestLogger(log, reqParams, handlerName, "Successfully", nil)
 		c.JSON(http.StatusOK, gin.H{
-			"shifts": shiftsService.ShiftListDTO,
+			"shifts": shiftsService,
 		})
 	}
 }

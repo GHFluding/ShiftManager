@@ -6,11 +6,6 @@ import (
 	"sm/internal/utils/logger"
 )
 
-type UserListToTransfer struct {
-	Valid       bool
-	UserListDTO []UserDTO
-}
-
 func DeleteUser(sp *ServicesParams, userid int64) bool {
 	err := sp.db.DeleteUser(context.Background(), userid)
 	if err != nil {
@@ -20,30 +15,28 @@ func DeleteUser(sp *ServicesParams, userid int64) bool {
 	return true
 }
 
-func UsersList(sp *ServicesParams) UserListToTransfer {
+func UsersList(sp *ServicesParams) ([]User, error) {
+	var UsersToOUT []User
 	users, err := sp.db.UsersList(context.Background())
 	if err != nil {
 		sp.log.Info("Failed to retrieve users from db", logger.ErrToAttr(err))
-		return UserListToTransfer{Valid: false}
+		return UsersToOUT, err
 	}
-	usersDTO, err := convertListToTransport[postgres.User, UserDTO](users)
-	if err != nil {
-		sp.log.Info("Failed to convert users from db", logger.ErrToAttr(err))
-		return UserListToTransfer{Valid: false}
+	for _, i := range users {
+		UsersToOUT = append(UsersToOUT, convertUser(i))
 	}
-	return UserListToTransfer{Valid: true, UserListDTO: usersDTO}
+	return UsersToOUT, nil
 }
 
-func UsersListByRole(sp *ServicesParams, role postgres.Userrole) UserListToTransfer {
+func UsersListByRole(sp *ServicesParams, role postgres.Userrole) ([]User, error) {
+	var UsersToOUT []User
 	users, err := sp.db.UsersListByRole(context.Background(), role)
 	if err != nil {
 		sp.log.Info("Failed to retrieve users from db", logger.ErrToAttr(err))
-		return UserListToTransfer{Valid: false}
+		return UsersToOUT, err
 	}
-	usersDTO, err := convertListToTransport[postgres.User, UserDTO](users)
-	if err != nil {
-		sp.log.Info("Failed to convert users from db", logger.ErrToAttr(err))
-		return UserListToTransfer{Valid: false}
+	for _, i := range users {
+		UsersToOUT = append(UsersToOUT, convertUser(i))
 	}
-	return UserListToTransfer{Valid: true, UserListDTO: usersDTO}
+	return UsersToOUT, nil
 }

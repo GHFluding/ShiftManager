@@ -34,13 +34,13 @@ func GetShiftWorkersList(log *slog.Logger, sp *services.ServicesParams) gin.Hand
 			logger.RequestLogger(log, reqParams, handlerName, "Error", err)
 			return
 		}
-		shiftWorkersService := services.ShiftWorkersList(sp, int64(shiftid))
-		if !shiftWorkersService.Valid {
+		shiftWorkersService, err := services.ShiftWorkersList(sp, int64(shiftid))
+		if err != nil {
 			return
 		}
 		logger.RequestLogger(log, reqParams, handlerName, "Successfully", nil)
 		c.JSON(http.StatusOK, gin.H{
-			"Workers": shiftWorkersService.WorkersListDTO,
+			"Workers": shiftWorkersService,
 		})
 	}
 }

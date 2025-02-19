@@ -23,13 +23,13 @@ func GetUserList(log *slog.Logger, sp *services.ServicesParams) gin.HandlerFunc 
 		const handlerName = "get request with user_list handler"
 		reqParams := handler_utils.CreateStartData(c)
 		logger.RequestLogger(log, reqParams, handlerName, "Start", nil)
-		usersService := services.UsersList(sp)
-		if !usersService.Valid {
+		usersService, err := services.UsersList(sp)
+		if err != nil {
 			return
 		}
 		logger.RequestLogger(log, reqParams, handlerName, "Successfully", nil)
 		c.JSON(http.StatusOK, gin.H{
-			"users": usersService.UserListDTO,
+			"users": usersService,
 		})
 	}
 }
@@ -56,13 +56,13 @@ func GetUserListByRole(log *slog.Logger, sp *services.ServicesParams) gin.Handle
 			logger.RequestLogger(log, reqParams, handlerName, "Error", err)
 			return
 		}
-		usersService := services.UsersListByRole(sp, role)
-		if !usersService.Valid {
+		usersService, err := services.UsersListByRole(sp, role)
+		if err != nil {
 			return
 		}
 		logger.RequestLogger(log, reqParams, handlerName, "Successfully", nil)
 		c.JSON(http.StatusOK, gin.H{
-			userRoleParam: usersService.UserListDTO,
+			userRoleParam: usersService,
 		})
 	}
 }
