@@ -34,9 +34,9 @@ func ChangeMachineToRepair(log *slog.Logger, sp *services.ServicesParams) gin.Ha
 			logger.RequestLogger(log, reqParams, handlerName, "Error", err)
 			return
 		}
-		ok := services.MachineNeedRepair(sp, int64(machineId))
-		if !ok {
-			logger.RequestLogger(log, reqParams, handlerName, "Error", errors.New("failed to change status"))
+		err = services.MachineNeedRepair(sp, int64(machineId))
+		if err != nil {
+			logger.RequestLogger(log, reqParams, handlerName, "Error", err)
 			return
 		}
 		logger.RequestLogger(log, reqParams, handlerName, "Successfully", nil)

@@ -30,13 +30,12 @@ func DeleteUser(log *slog.Logger, sp *services.ServicesParams) gin.HandlerFunc {
 		userIdFromPath := c.Param("id")
 		userId, err := strconv.Atoi(userIdFromPath)
 		if err != nil {
-			err := errors.New("invalid user id")
-			logger.RequestLogger(log, reqParams, handlerName, "Error", err)
+			logger.RequestLogger(log, reqParams, handlerName, "Error", errors.New("invalid user id"))
 			return
 		}
-		ok := services.DeleteUser(sp, int64(userId))
-		if !ok {
-			logger.RequestLogger(log, reqParams, handlerName, "Error", errors.New("Failed to delete users from db"))
+		err = services.DeleteUser(sp, int64(userId))
+		if err != nil {
+			logger.RequestLogger(log, reqParams, handlerName, "Error", err)
 			return
 		}
 		logger.RequestLogger(log, reqParams, handlerName, "Successfully", nil)

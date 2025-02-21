@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"errors"
 	"log/slog"
 	"net/http"
 	"sm/internal/services"
@@ -49,20 +48,14 @@ func GetUserListByRole(log *slog.Logger, sp *services.ServicesParams) gin.Handle
 		const handlerName = "get request with user_list_by_id handler"
 		reqParams := handler_utils.CreateStartData(c)
 		logger.RequestLogger(log, reqParams, handlerName, "Start", nil)
-		userRoleParam := c.Param("role")
-		role, ok := handler_utils.DetectUserRole(userRoleParam)
-		if !ok {
-			err := errors.New("invalid user role")
-			logger.RequestLogger(log, reqParams, handlerName, "Error", err)
-			return
-		}
-		usersService, err := services.UsersListByRole(sp, role)
+		role := c.Param("role")
+		users, err := services.UsersListByRole(sp, role)
 		if err != nil {
 			return
 		}
 		logger.RequestLogger(log, reqParams, handlerName, "Successfully", nil)
 		c.JSON(http.StatusOK, gin.H{
-			userRoleParam: usersService,
+			role: users,
 		})
 	}
 }
