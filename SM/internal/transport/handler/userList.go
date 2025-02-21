@@ -1,12 +1,11 @@
 package handler
 
 import (
-	"context"
 	"errors"
+	"log/slog"
 	"net/http"
-	"sm/internal/database/postgres"
+	"sm/internal/services"
 	"sm/internal/utils/handler_utils"
-	handler_output "sm/internal/utils/handler_utils/output"
 	"sm/internal/utils/logger"
 
 	"github.com/gin-gonic/gin"
@@ -18,25 +17,19 @@ import (
 // @Produce json
 // @Success 200 {array} handler_output.UserOutput "List of users"
 // @Failure 500 {object} gin.H "Server error"
-// @Router /api/students [get]
-func GetUserList(p handler_utils.Params) gin.HandlerFunc {
+// @Router /api/users [get]
+func GetUserList(log *slog.Logger, sp *services.ServicesParams) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		const handlerName = "get request with user_list handler"
 		reqParams := handler_utils.CreateStartData(c)
-		logger.RequestLogger(p.Log, reqParams, handlerName, "Start", nil)
-		users, err := p.DB.UsersList(context.Background())
+		logger.RequestLogger(log, reqParams, handlerName, "Start", nil)
+		usersService, err := services.UsersList(sp)
 		if err != nil {
-			logger.RequestLogger(p.Log, reqParams, handlerName, "Error", err)
 			return
 		}
-		usersOut, err := handler_output.ConvertListToOut[postgres.User, handler_output.UserOutput](users)
-		if err != nil {
-			logger.RequestLogger(p.Log, reqParams, handlerName, "Error", err)
-			return
-		}
-		logger.RequestLogger(p.Log, reqParams, handlerName, "Successfully", nil)
+		logger.RequestLogger(log, reqParams, handlerName, "Successfully", nil)
 		c.JSON(http.StatusOK, gin.H{
-			"users": usersOut,
+			"users": usersService,
 		})
 	}
 }
@@ -50,32 +43,26 @@ func GetUserList(p handler_utils.Params) gin.HandlerFunc {
 // @Param        role   path      string  true  "Users role" format(id)
 // @Success 	 200 {array} handler_output.UserOutput "List of users with role"
 // @Failure      400  {object}  gin.H "invalid data"
-// @Router       /api/students/{role} [get]
-func GetUserListByRole(p handler_utils.Params) gin.HandlerFunc {
+// @Router       /api/users/{role} [get]
+func GetUserListByRole(log *slog.Logger, sp *services.ServicesParams) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		const handlerName = "get request with user_list_by_id handler"
 		reqParams := handler_utils.CreateStartData(c)
-		logger.RequestLogger(p.Log, reqParams, handlerName, "Start", nil)
+		logger.RequestLogger(log, reqParams, handlerName, "Start", nil)
 		userRoleParam := c.Param("role")
 		role, ok := handler_utils.DetectUserRole(userRoleParam)
 		if !ok {
 			err := errors.New("invalid user role")
-			logger.RequestLogger(p.Log, reqParams, handlerName, "Error", err)
+			logger.RequestLogger(log, reqParams, handlerName, "Error", err)
 			return
 		}
-		users, err := p.DB.UsersListByRole(context.Background(), role)
+		usersService, err := services.UsersListByRole(sp, role)
 		if err != nil {
-			logger.RequestLogger(p.Log, reqParams, handlerName, "Error", err)
 			return
 		}
-		usersOut, err := handler_output.ConvertListToOut[postgres.User, handler_output.UserOutput](users)
-		if err != nil {
-			logger.RequestLogger(p.Log, reqParams, handlerName, "Error", err)
-			return
-		}
-		logger.RequestLogger(p.Log, reqParams, handlerName, "Successfully", nil)
+		logger.RequestLogger(log, reqParams, handlerName, "Successfully", nil)
 		c.JSON(http.StatusOK, gin.H{
-			userRoleParam: usersOut,
+			userRoleParam: usersService,
 		})
 	}
 }

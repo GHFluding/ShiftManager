@@ -1,0 +1,7 @@
+
+CREATE TABLE Machine(
+    id BIGSERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    isRepairRequired BOOLEAN DEFAULT FALSE, 
+    isActive BOOLEAN DEFAULT TRUE
+);
