@@ -24,7 +24,7 @@ func UsersList(sp *ServicesParams) ([]User, error) {
 		return users, err
 	}
 	for _, i := range usersDB {
-		users = append(users, convertUser(i))
+		users = append(users, convertUserDB(i))
 	}
 	return users, nil
 }
@@ -41,7 +41,7 @@ func UsersListByRole(sp *ServicesParams, reqRole string) ([]User, error) {
 		return users, err
 	}
 	for _, i := range usersDB {
-		users = append(users, convertUser(i))
+		users = append(users, convertUserDB(i))
 	}
 	return users, nil
 }
@@ -49,13 +49,15 @@ func UsersListByRole(sp *ServicesParams, reqRole string) ([]User, error) {
 func CreateUser(sp *ServicesParams, req User) (User, error) {
 	userParams, err := convertCreateUserParams(req)
 	if err != nil {
+		sp.log.Info("Failed to convert params for creating user: ", logger.ErrToAttr(err))
 		return User{}, err
 	}
 	userDB, err := sp.db.CreateUser(context.Background(), userParams)
 	if err != nil {
+		sp.log.Info("Failed to create user: ", logger.ErrToAttr(err))
 		return User{}, err
 	}
-	user := convertUser(userDB)
+	user := convertUserDB(userDB)
 	return user, nil
 }
 

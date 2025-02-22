@@ -21,9 +21,10 @@ func CreateMachine(sp *ServicesParams, req Machine) (Machine, error) {
 	machineParams := convertCreateMachineParams(req)
 	machineDB, err := sp.db.CreateMachine(context.Background(), machineParams)
 	if err != nil {
+		sp.log.Info("Failed to create machine: ", logger.ErrToAttr(err))
 		return Machine{}, err
 	}
-	machine := convertMachine(machineDB)
+	machine := convertMachineDB(machineDB)
 	return machine, nil
 }
 func convertCreateMachineParams(req Machine) postgres.CreateMachineParams {

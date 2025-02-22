@@ -19,7 +19,7 @@ type createMachineDTO struct {
 
 func CreateMachine(log *slog.Logger, sp *services.ServicesParams) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		const handlerName = "get request with create_user handler"
+		const handlerName = "get request with create_machine handler"
 		reqParams := handler_utils.CreateStartData(c)
 		logger.RequestLogger(log, reqParams, handlerName, "Start", nil)
 		req, err := parseCreateMachineRequest(c, log)
