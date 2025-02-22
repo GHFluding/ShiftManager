@@ -34,13 +34,15 @@ func CreateUser(log *slog.Logger, sp *services.ServicesParams) gin.HandlerFunc {
 			logger.RequestLogger(log, reqParams, handlerName, "Error", err)
 		}
 		userParams := convertUserForServices(req)
-		err = services.CreateUser(sp, userParams)
+		user, err := services.CreateUser(sp, userParams)
 		if err != nil {
 			logger.RequestLogger(log, reqParams, handlerName, "Error", err)
 			return
 		}
 		logger.RequestLogger(log, reqParams, handlerName, "Successfully", nil)
-		c.JSON(http.StatusOK, gin.H{})
+		c.JSON(http.StatusOK, gin.H{
+			"user": user,
+		})
 	}
 }
 
@@ -74,10 +76,10 @@ func CheckUserRole(sRole string) bool {
 }
 
 func convertUserForServices(req createUserDTO) services.User {
-	var user services.User
-	user.ID = req.ID
-	user.Bitrixid = req.Bitrixid
-	user.Name = req.Name
-	user.Role = req.Role
-	return user
+	return services.User{
+		ID:       req.ID,
+		Bitrixid: req.Bitrixid,
+		Name:     req.Name,
+		Role:     req.Role,
+	}
 }

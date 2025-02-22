@@ -4,6 +4,8 @@ import (
 	"context"
 	"sm/internal/database/postgres"
 	"sm/internal/utils/logger"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 func MachineNeedRepair(sp *ServicesParams, machineid int64) error {
@@ -15,21 +17,26 @@ func MachineNeedRepair(sp *ServicesParams, machineid int64) error {
 	return nil
 }
 
-func CreateMachine(sp *ServicesParams, req Machine) error {
+func CreateMachine(sp *ServicesParams, req Machine) (Machine, error) {
 	machineParams := convertCreateMachineParams(req)
-	_, err := sp.db.CreateMachine(context.Background(), machineParams)
+	machineDB, err := sp.db.CreateMachine(context.Background(), machineParams)
 	if err != nil {
-		return err
+		return Machine{}, err
 	}
-	return nil
+	machine := convertMachine(machineDB)
+	return machine, nil
 }
 func convertCreateMachineParams(req Machine) postgres.CreateMachineParams {
-	var machineParams postgres.CreateMachineParams
-	machineParams.ID = req.ID
-	machineParams.Name = req.Name
-	machineParams.Isrepairrequired.Valid = true
-	machineParams.Isrepairrequired.Bool = req.Isrepairrequired
-	machineParams.Isactive.Valid = true
-	machineParams.Isactive.Bool = req.Isactive
-	return machineParams
+	return postgres.CreateMachineParams{
+		ID:   req.ID,
+		Name: req.Name,
+		Isrepairrequired: pgtype.Bool{
+			Valid: true,
+			Bool:  req.Isrepairrequired,
+		},
+		Isactive: pgtype.Bool{
+			Valid: true,
+			Bool:  req.Isactive,
+		},
+	}
 }

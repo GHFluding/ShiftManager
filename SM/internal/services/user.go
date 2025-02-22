@@ -46,30 +46,30 @@ func UsersListByRole(sp *ServicesParams, reqRole string) ([]User, error) {
 	return users, nil
 }
 
-func CreateUser(sp *ServicesParams, req User) error {
+func CreateUser(sp *ServicesParams, req User) (User, error) {
 	userParams, err := convertCreateUserParams(req)
 	if err != nil {
-		return err
+		return User{}, err
 	}
-	user, err := sp.db.CreateUser(context.Background(), userParams)
-	_ = user
+	userDB, err := sp.db.CreateUser(context.Background(), userParams)
 	if err != nil {
-		return err
+		return User{}, err
 	}
-	return nil
+	user := convertUser(userDB)
+	return user, nil
 }
 
 func convertCreateUserParams(req User) (postgres.CreateUserParams, error) {
-	var userParams postgres.CreateUserParams
-	userParams.ID = req.ID
-	userParams.Bitrixid = req.Bitrixid
-	userParams.Name = req.Name
-	var ok bool
-	userParams.Role, ok = detectUserRole(req.Role)
+	role, ok := detectUserRole(req.Role)
 	if !ok {
-		return userParams, errors.New("Invalid role")
+		return postgres.CreateUserParams{}, errors.New("Invalid role")
 	}
-	return userParams, nil
+	return postgres.CreateUserParams{
+		ID:       req.ID,
+		Bitrixid: req.Bitrixid,
+		Name:     req.Name,
+		Role:     role,
+	}, nil
 }
 
 func detectUserRole(sRole string) (postgres.Userrole, bool) {

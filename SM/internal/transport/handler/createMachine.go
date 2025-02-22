@@ -28,13 +28,15 @@ func CreateMachine(log *slog.Logger, sp *services.ServicesParams) gin.HandlerFun
 			return
 		}
 		machineParams := convertMachineForServices(req)
-		err = services.CreateMachine(sp, machineParams)
+		machine, err := services.CreateMachine(sp, machineParams)
 		if err != nil {
 			logger.RequestLogger(log, reqParams, handlerName, "Error", err)
 			return
 		}
 		logger.RequestLogger(log, reqParams, handlerName, "Successfully", nil)
-		c.JSON(http.StatusOK, gin.H{})
+		c.JSON(http.StatusOK, gin.H{
+			"machine": machine,
+		})
 	}
 }
 
@@ -51,10 +53,10 @@ func parseCreateMachineRequest(c *gin.Context, log *slog.Logger) (createMachineD
 }
 
 func convertMachineForServices(req createMachineDTO) services.Machine {
-	var machine services.Machine
-	machine.ID = req.ID
-	machine.Name = req.Name
-	machine.Isrepairrequired = req.Isrepairrequired
-	machine.Isactive = req.Isactive
-	return machine
+	return services.Machine{
+		ID:               req.ID,
+		Name:             req.Name,
+		Isrepairrequired: req.Isrepairrequired,
+		Isactive:         req.Isactive,
+	}
 }
