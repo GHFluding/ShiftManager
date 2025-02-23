@@ -2,12 +2,71 @@ package services
 
 import (
 	"context"
+	"errors"
 	"sm/internal/database/postgres"
 	"sm/internal/services/logic"
 	"sm/internal/utils/logger"
 
 	"github.com/jackc/pgx/v5/pgtype"
 )
+
+type UpdateTaskParams struct {
+	UserID  int64
+	Comment string
+	Command string
+}
+
+func UpdateTask(sp *ServicesParams, reqId int64, reqParams UpdateTaskParams) error {
+	switch reqParams.Command {
+	case "inProgress":
+		req := postgres.SetTaskStatusInProgressParams{
+			Movedinprogressby: pgtype.Int8{
+				Int64: reqParams.UserID,
+				Valid: true,
+			},
+			ID: reqId,
+		}
+		err := sp.db.SetTaskStatusInProgress(context.Background(), req)
+		return err
+	case "completed":
+		req := postgres.SetTaskStatusCompletedParams{
+			Completedby: pgtype.Int8{
+				Int64: reqParams.UserID,
+				Valid: true,
+			},
+			ID: reqId,
+		}
+		err := sp.db.SetTaskStatusCompleted(context.Background(), req)
+		return err
+	case "verified":
+		req := postgres.SetTaskStatusVerifiedParams{
+			Verifiedby: pgtype.Int8{
+				Int64: reqParams.UserID,
+				Valid: true,
+			},
+			ID: reqId,
+		}
+		err := sp.db.SetTaskStatusVerified(context.Background(), req)
+		return err
+	case "failed":
+		req := postgres.SetTaskStatusFailedParams{
+			Comment: pgtype.Text{
+				String: reqParams.Comment,
+				Valid:  true,
+			},
+			ID: reqId,
+		}
+		err := sp.db.SetTaskStatusFailed(context.Background(), req)
+		return err
+	default:
+		return errors.New("Invalid command")
+	}
+}
+
+func DeleteTask(sp *ServicesParams, id int64) error {
+	err := sp.db.DeleteTask(context.Background(), id)
+	return err
+}
 
 func CreateTask(sp *ServicesParams, req Task) (Task, error) {
 	taskParams := convertCreateTaskParams(req)
