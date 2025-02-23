@@ -14,7 +14,7 @@ func ShiftWorkersList(sp *ServicesParams, shiftid int64) ([]ShiftWorker, error) 
 	}
 
 	for _, i := range shiftWorkersDB {
-		ShiftsWorkers = append(ShiftsWorkers, convertShiftWorker(i))
+		ShiftsWorkers = append(ShiftsWorkers, convertShiftWorkerDB(i))
 	}
 	return ShiftsWorkers, nil
 }
@@ -27,7 +27,7 @@ func ShiftTasksList(sp *ServicesParams, shiftid int64) ([]ShiftTask, error) {
 		return shiftTask, err
 	}
 	for _, i := range shiftTasksDB {
-		shiftTask = append(shiftTask, convertShiftTask(i))
+		shiftTask = append(shiftTask, convertShiftTaskDB(i))
 	}
 	return shiftTask, nil
 }

@@ -9,7 +9,7 @@ type User struct {
 	Role     string
 }
 
-func convertUser(inp postgres.User) User {
+func convertUserDB(inp postgres.User) User {
 	var out User
 	out.ID = inp.ID
 	out.Bitrixid = inp.Bitrixid
@@ -27,7 +27,7 @@ type Shift struct {
 	Deactivatedat string
 }
 
-func convertShift(inp postgres.Shift) Shift {
+func convertShiftDB(inp postgres.Shift) Shift {
 	var out Shift
 	out.ID = inp.ID
 	out.Machineid = inp.Machineid
@@ -59,7 +59,7 @@ type Task struct {
 	Movedinprogressat string
 }
 
-func convertTask(inp postgres.Task) Task {
+func convertTaskDB(inp postgres.Task) Task {
 	var out Task
 	out.ID = inp.ID
 	out.Machineid = inp.Machineid
@@ -104,7 +104,7 @@ type Machine struct {
 	Isactive         bool
 }
 
-func convertMachine(inp postgres.Machine) Machine {
+func convertMachineDB(inp postgres.Machine) Machine {
 	var out Machine
 	out.ID = inp.ID
 	out.Name = inp.Name
@@ -120,7 +120,7 @@ type ShiftWorker struct {
 	Userid  int64
 }
 
-func convertShiftWorker(inp postgres.ShiftWorker) ShiftWorker {
+func convertShiftWorkerDB(inp postgres.ShiftWorker) ShiftWorker {
 	var out ShiftWorker
 	out.Shiftid = inp.Shiftid
 	out.Userid = inp.Userid
@@ -132,7 +132,7 @@ type ShiftTask struct {
 	Taskid  int64
 }
 
-func convertShiftTask(inp postgres.ShiftTask) ShiftTask {
+func convertShiftTaskDB(inp postgres.ShiftTask) ShiftTask {
 	var out ShiftTask
 	out.Shiftid = inp.Shiftid
 	out.Taskid = inp.Taskid

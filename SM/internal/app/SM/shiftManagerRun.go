@@ -57,12 +57,14 @@ func Run() {
 	usersGroup := r.Group("/api/users")
 	{
 		usersGroup.GET("/", handler.GetUserList(log, handlerParams))
+		usersGroup.POST("/", handler.CreateUser(log, handlerParams))
 		usersGroup.GET("/:role", handler.GetUserListByRole(log, handlerParams))
 		usersGroup.DELETE("/:id", handler.DeleteUser(log, handlerParams))
 	}
 	machineGroup := r.Group("/api/machine")
 	{
 		machineGroup.PUT("/:id", handler.ChangeMachineToRepair(log, handlerParams))
+		machineGroup.POST("/", handler.CreateMachine(log, handlerParams))
 	}
 	shiftGroup := r.Group("/api/shifts")
 	{
