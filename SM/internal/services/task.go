@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"errors"
 	"sm/internal/database/postgres"
 	"sm/internal/services/logic"
 	"sm/internal/utils/logger"
@@ -13,54 +12,32 @@ import (
 type UpdateTaskParams struct {
 	UserID  int64
 	Comment string
-	Command string
+	Status  string
 }
 
 func UpdateTask(sp *ServicesParams, reqId int64, reqParams UpdateTaskParams) error {
-	switch reqParams.Command {
-	case "inProgress":
-		req := postgres.SetTaskStatusInProgressParams{
-			Movedinprogressby: pgtype.Int8{
-				Int64: reqParams.UserID,
-				Valid: true,
-			},
-			ID: reqId,
-		}
-		err := sp.db.SetTaskStatusInProgress(context.Background(), req)
-		return err
-	case "completed":
-		req := postgres.SetTaskStatusCompletedParams{
-			Completedby: pgtype.Int8{
-				Int64: reqParams.UserID,
-				Valid: true,
-			},
-			ID: reqId,
-		}
-		err := sp.db.SetTaskStatusCompleted(context.Background(), req)
-		return err
-	case "verified":
-		req := postgres.SetTaskStatusVerifiedParams{
-			Verifiedby: pgtype.Int8{
-				Int64: reqParams.UserID,
-				Valid: true,
-			},
-			ID: reqId,
-		}
-		err := sp.db.SetTaskStatusVerified(context.Background(), req)
-		return err
-	case "failed":
-		req := postgres.SetTaskStatusFailedParams{
-			Comment: pgtype.Text{
-				String: reqParams.Comment,
-				Valid:  true,
-			},
-			ID: reqId,
-		}
-		err := sp.db.SetTaskStatusFailed(context.Background(), req)
-		return err
-	default:
-		return errors.New("Invalid command")
+	userValid := true
+	if reqParams.UserID == 0 {
+		userValid = false
 	}
+	commentValid := true
+	if reqParams.Comment == "" {
+		commentValid = false
+	}
+	updateParams := postgres.UpdateTaskStatusParams{
+		Taskid: reqId,
+		Status: postgres.Taskstatus(reqParams.Status),
+		Comment: pgtype.Text{
+			String: reqParams.Status,
+			Valid:  commentValid,
+		},
+		Userid: pgtype.Int8{
+			Int64: reqParams.UserID,
+			Valid: userValid,
+		},
+	}
+	err := sp.db.UpdateTaskStatus(context.Background(), updateParams)
+	return err
 }
 
 func DeleteTask(sp *ServicesParams, id int64) error {

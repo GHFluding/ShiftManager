@@ -15,7 +15,7 @@ import (
 type updateTaskDTO struct {
 	UserId  int64  `json:"userid"`
 	Comment string `json:"comment" `
-	Command string `json:"command"`
+	Status  string `json:"status"`
 }
 
 // UpdateTask update task.
@@ -72,6 +72,6 @@ func convertUpdateTaskToService(req updateTaskDTO) services.UpdateTaskParams {
 	return services.UpdateTaskParams{
 		UserID:  req.UserId,
 		Comment: req.Comment,
-		Command: req.Command,
+		Status:  req.Status,
 	}
 }

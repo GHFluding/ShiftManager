@@ -146,3 +146,36 @@ func (q *Queries) SetTaskStatusVerified(ctx context.Context, arg SetTaskStatusVe
 	_, err := q.db.Exec(ctx, setTaskStatusVerified, arg.Verifiedby, arg.ID)
 	return err
 }
+
+const updateTaskStatus = `-- name: UpdateTaskStatus :exec
+UPDATE Tasks
+SET 
+    status = $1,
+    comment = COALESCE($2, comment),
+    verifiedBy = CASE WHEN $1 = 'verified' THEN $3 ELSE verifiedBy END,
+    verifiedAt = CASE WHEN $1 = 'verified' THEN NOW() ELSE verifiedAt END,
+    completedBy = CASE WHEN $1 = 'completed' THEN $3 ELSE completedBy END,
+    completedAt = CASE WHEN $1 = 'completed' THEN NOW() ELSE completedAt END,
+    movedInProgressBy = CASE WHEN $1 = 'inProgress' THEN $3 ELSE movedInProgressBy END,
+    movedInProgressAt = CASE WHEN $1 = 'inProgress' THEN NOW() ELSE movedInProgressAt END,
+    failedBy = CASE WHEN $1 = 'failed' THEN $3 ELSE failedBy END,
+    failedAt = CASE WHEN $1 = 'failed' THEN NOW() ELSE failedAt END
+WHERE id = $4
+`
+
+type UpdateTaskStatusParams struct {
+	Status  Taskstatus
+	Comment pgtype.Text
+	Userid  pgtype.Int8
+	Taskid  int64
+}
+
+func (q *Queries) UpdateTaskStatus(ctx context.Context, arg UpdateTaskStatusParams) error {
+	_, err := q.db.Exec(ctx, updateTaskStatus,
+		arg.Status,
+		arg.Comment,
+		arg.Userid,
+		arg.Taskid,
+	)
+	return err
+}
