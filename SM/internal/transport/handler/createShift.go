@@ -16,6 +16,17 @@ type createShiftDTO struct {
 	ShiftMaster int64 `json:"shiftmaster"`
 }
 
+// CreateShift create new shift.
+// @Summary      create a shift
+// @Description  create new shift in db.
+// @Tags         shift
+// @Accept       json
+// @Produce      json
+// @Param        shift  body  createShiftDTO  true  "Shift data"
+// @Success      201  {object}  services.Shift
+// @Failure      400  {object}  map[string]interface{} "Invalid data"
+// @Failure 500 {object} map[string]interface{} "Failed"
+// @Router       /api/task/ [post]
 func CreateShift(log *slog.Logger, sp *services.ServicesParams) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		const handlerName = "get request with create_shift handler"

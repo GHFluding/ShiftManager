@@ -18,9 +18,9 @@ import (
 // @Accept       json
 // @Produce      json
 // @Param        id   path      int64 true "Machine id"
-// @Success      204  {object} gin.H "No connection"
-// @Failure      400  {object} gin.H "invalid data"
-// @Failure      404  {object}  gin.H "missing id"
+// @Success      204  {object} map[string]interface{} "No connection"
+// @Failure      400  {object} map[string]interface{} "invalid data"
+// @Failure      404  {object}  map[string]interface{} "missing id"
 // @Router       /api/machine/{id} [put]
 func ChangeMachineToRepair(log *slog.Logger, sp *services.ServicesParams) gin.HandlerFunc {
 	return func(c *gin.Context) {

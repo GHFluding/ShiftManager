@@ -2,10 +2,43 @@ basePath: /api
 consumes:
 - application/json
 definitions:
-  gin.H:
-    additionalProperties: {}
+  handler.addWorkerDTO:
+    properties:
+      shiftId:
+        type: integer
+      workerid:
+        type: integer
     type: object
-  handler_output.ShiftOutput:
+  handler.createShiftDTO:
+    properties:
+      id:
+        type: integer
+      machineid:
+        type: integer
+      shiftmaster:
+        type: integer
+    type: object
+  handler.createUserDTO:
+    properties:
+      bitrixid:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+      role:
+        type: string
+    type: object
+  handler.updateTaskDTO:
+    properties:
+      command:
+        type: string
+      comment:
+        type: string
+      userid:
+        type: integer
+    type: object
+  services.Shift:
     properties:
       createdat:
         type: string
@@ -20,7 +53,21 @@ definitions:
       shiftMaster:
         type: integer
     type: object
-  handler_output.UserOutput:
+  services.ShiftTask:
+    properties:
+      shiftid:
+        type: integer
+      taskid:
+        type: integer
+    type: object
+  services.ShiftWorker:
+    properties:
+      shiftid:
+        type: integer
+      userid:
+        type: integer
+    type: object
+  services.User:
     properties:
       bitrixid:
         type: integer
@@ -30,20 +77,6 @@ definitions:
         type: string
       role:
         type: string
-    type: object
-  postgres.ShiftTask:
-    properties:
-      shiftid:
-        type: integer
-      taskid:
-        type: integer
-    type: object
-  postgres.ShiftWorker:
-    properties:
-      shiftid:
-        type: integer
-      userid:
-        type: integer
     type: object
 host: localhost:8080
 info:
@@ -76,18 +109,53 @@ paths:
         "204":
           description: No connection
           schema:
-            $ref: '#/definitions/gin.H'
+            additionalProperties: true
+            type: object
         "400":
           description: invalid data
           schema:
-            $ref: '#/definitions/gin.H'
+            additionalProperties: true
+            type: object
         "404":
           description: missing id
           schema:
-            $ref: '#/definitions/gin.H'
+            additionalProperties: true
+            type: object
       summary: change machine status to need repair
       tags:
       - machine
+  /api/shift/workers/:
+    post:
+      consumes:
+      - application/json
+      description: create new shift worker in db.
+      parameters:
+      - description: Task data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/handler.addWorkerDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/services.ShiftWorker'
+        "400":
+          description: Invalid data
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Failed
+          schema:
+            additionalProperties: true
+            type: object
+      summary: create a shift worker
+      tags:
+      - shift worker
   /api/shifts:
     get:
       description: get out shifts that are active.
@@ -98,15 +166,144 @@ paths:
           description: List of active shifts
           schema:
             items:
-              $ref: '#/definitions/handler_output.ShiftOutput'
+              $ref: '#/definitions/services.Shift'
             type: array
         "500":
           description: Server error
           schema:
-            $ref: '#/definitions/gin.H'
+            additionalProperties: true
+            type: object
       summary: get out shifts that are active
       tags:
       - shifts
+  /api/task/:
+    post:
+      consumes:
+      - application/json
+      description: create new shift in db.
+      parameters:
+      - description: Shift data
+        in: body
+        name: shift
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createShiftDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/services.Shift'
+        "400":
+          description: Invalid data
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Failed
+          schema:
+            additionalProperties: true
+            type: object
+      summary: create a shift
+      tags:
+      - shift
+  /api/task/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a task:id from the database.
+      parameters:
+      - description: User id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No connection
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: invalid data
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: missing id
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete task
+      tags:
+      - users
+    patch:
+      consumes:
+      - application/json
+      description: 'commands for update task: inProgress, completed, verified, failed'
+      parameters:
+      - description: Task data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/handler.updateTaskDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid data
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Failed
+          schema:
+            additionalProperties: true
+            type: object
+      summary: update task task by command
+      tags:
+      - task
+  /api/user/:
+    post:
+      consumes:
+      - application/json
+      description: create new user in db.
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createUserDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/services.User'
+        "400":
+          description: Invalid data
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Failed
+          schema:
+            additionalProperties: true
+            type: object
+      summary: create a user
+      tags:
+      - user
   /api/users:
     get:
       description: Get all users
@@ -117,12 +314,13 @@ paths:
           description: List of users
           schema:
             items:
-              $ref: '#/definitions/handler_output.UserOutput'
+              $ref: '#/definitions/services.User'
             type: array
         "500":
           description: Server error
           schema:
-            $ref: '#/definitions/gin.H'
+            additionalProperties: true
+            type: object
       summary: Get list of users
   /api/users/{id}:
     delete:
@@ -141,15 +339,18 @@ paths:
         "204":
           description: No connection
           schema:
-            $ref: '#/definitions/gin.H'
+            additionalProperties: true
+            type: object
         "400":
           description: invalid data
           schema:
-            $ref: '#/definitions/gin.H'
+            additionalProperties: true
+            type: object
         "404":
           description: missing id
           schema:
-            $ref: '#/definitions/gin.H'
+            additionalProperties: true
+            type: object
       summary: Delete user
       tags:
       - users
@@ -171,12 +372,13 @@ paths:
           description: List of shift workers by shift id
           schema:
             items:
-              $ref: '#/definitions/postgres.ShiftWorker'
+              $ref: '#/definitions/services.ShiftWorker'
             type: array
         "400":
           description: invalid data
           schema:
-            $ref: '#/definitions/gin.H'
+            additionalProperties: true
+            type: object
       summary: Get list of shift workers  by shift id
       tags:
       - shift worker
@@ -199,12 +401,13 @@ paths:
           description: List of users with role
           schema:
             items:
-              $ref: '#/definitions/handler_output.UserOutput'
+              $ref: '#/definitions/services.User'
             type: array
         "400":
           description: invalid data
           schema:
-            $ref: '#/definitions/gin.H'
+            additionalProperties: true
+            type: object
       summary: Get list of users with role
       tags:
       - students

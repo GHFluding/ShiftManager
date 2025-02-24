@@ -19,8 +19,8 @@ import (
 // @Accept       json
 // @Produce      json
 // @Param        id   path      int64  true  "Shift id" format(id)
-// @Success 	 200 {array} postgres.ShiftTask "List of task by shift id"
-// @Failure      400  {object}  gin.H "invalid data"
+// @Success 	 200 {array} services.ShiftTask "List of task by shift id"
+// @Failure      400  {object}  map[string]interface{} "invalid data"
 // @Router       /api/users/{id} [get]
 func GetShiftTaskList(log *slog.Logger, sp *services.ServicesParams) gin.HandlerFunc {
 	return func(c *gin.Context) {

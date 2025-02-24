@@ -20,6 +20,18 @@ type createTaskDTO struct {
 	Createdby    int64  `json:"createdby"`
 }
 
+// CreateTask create new task.
+// @Summary      create a task
+// @Description  create new task in db.
+// @Tags         task
+// @Accept       json
+// @Produce      json
+// @Param        user  body  createTaskDTO  true  "Task data"
+// @Success      201  {object}  services.Task
+// @Failure      400  {object}  map[string]interface{} "Invalid data"
+// @Failure 500 {object} map[string]interface{} "Failed"
+// @Router       /api/task/ [post]
+
 func CreateTask(log *slog.Logger, sp *services.ServicesParams) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		const handlerName = "get request with create_task handler"

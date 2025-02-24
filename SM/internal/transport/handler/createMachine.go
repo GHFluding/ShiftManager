@@ -17,6 +17,18 @@ type createMachineDTO struct {
 	Isactive         bool   `json:"Isactive"`
 }
 
+// CreateMachine create new machine.
+// @Summary      create a machine
+// @Description  create new machine in db.
+// @Tags         machine
+// @Accept       json
+// @Produce      json
+// @Param        user  body  createMachineDTO  true  "Machine data"
+// @Success      201  {object}  services.Machine
+// @Failure      400  {object}  map[string]interface{} "Invalid data"
+// @Failure 500 {object} map[string]interface{} "Failed"
+// @Router       /api/machine/ [post]
+
 func CreateMachine(log *slog.Logger, sp *services.ServicesParams) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		const handlerName = "get request with create_machine handler"

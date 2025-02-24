@@ -15,8 +15,8 @@ import (
 // @Description    get all shifts.
 // @Tags         shifts
 // @Produce json
-// @Success 200 {array} handler_output.ShiftOutput "List of shifts"
-// @Failure 500 {object} gin.H "Server error"
+// @Success 200 {array} services.Shift "List of shifts"
+// @Failure 500 {object} map[string]interface{} "Server error"
 // @Router /api/shifts [get]
 func GetShiftList(log *slog.Logger, sp *services.ServicesParams) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -39,8 +39,8 @@ func GetShiftList(log *slog.Logger, sp *services.ServicesParams) gin.HandlerFunc
 // @Description   get out shifts that are active.
 // @Tags         shifts
 // @Produce json
-// @Success 200 {array} handler_output.ShiftOutput "List of active shifts"
-// @Failure 500 {object} gin.H "Server error"
+// @Success 200 {array} services.Shift "List of active shifts"
+// @Failure 500 {object} map[string]interface{} "Server error"
 // @Router /api/shifts [get]
 func GetActiveShiftList(log *slog.Logger, sp *services.ServicesParams) gin.HandlerFunc {
 	return func(c *gin.Context) {

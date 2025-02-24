@@ -18,6 +18,17 @@ type createUserDTO struct {
 	Role     string `json:"role"`
 }
 
+// CreateUser create new user.
+// @Summary      create a user
+// @Description  create new user in db.
+// @Tags         user
+// @Accept       json
+// @Produce      json
+// @Param        user  body  createUserDTO  true  "User data"
+// @Success      201  {object}  services.User
+// @Failure      400  {object}  map[string]interface{} "Invalid data"
+// @Failure 500 {object} map[string]interface{} "Failed"
+// @Router       /api/user/ [post]
 func CreateUser(log *slog.Logger, sp *services.ServicesParams) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		const handlerName = "get request with create_user handler"
