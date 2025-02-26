@@ -19,3 +19,12 @@ func AddShiftWorker(sp *ServicesParams, req ShiftWorker) (ShiftWorker, error) {
 	shiftWorker := convertShiftWorkerDB(shiftWorkerDB)
 	return shiftWorker, nil
 }
+
+func DeleteShiftWorker(sp *ServicesParams, reqUserID int64, reqShiftId int64) error {
+	req := postgres.DeleteShiftWorkerParams{
+		Shiftid: reqShiftId,
+		Userid:  reqUserID,
+	}
+	err := sp.db.DeleteShiftWorker(context.Background(), req)
+	return err
+}
