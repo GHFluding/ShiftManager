@@ -23,7 +23,7 @@ import (
 // @Success      204  {object} map[string]interface{} "No connection"
 // @Failure      400  {object} map[string]interface{} "invalid data"
 // @Failure      404  {object} map[string]interface{} "missing id"
-// @Router       /api/shift/{shiftid}/{taskid} [delete]
+// @Router       /api/shifts/{shiftid}/taskid/{taskid} [delete]
 func DeleteShiftTask(log *slog.Logger, sp *services.ServicesParams) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		const handlerName = "get request with user_list handler"

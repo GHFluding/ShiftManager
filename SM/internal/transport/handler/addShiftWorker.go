@@ -25,7 +25,7 @@ type addWorkerDTO struct {
 // @Success      201  {object}  services.ShiftWorker
 // @Failure      400  {object}  map[string]interface{} "Invalid data"
 // @Failure 500 {object} map[string]interface{} "Failed"
-// @Router       /api/shift/workers/ [post]
+// @Router       /api/shifts/workers/ [post]
 func AddShiftWorker(log *slog.Logger, sp *services.ServicesParams) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		const handlerName = "get request with add_shift_worker handler"

@@ -7,7 +7,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - "D:/ShiftManager/SM/configs/nginx/nginx.config:/etc/nginx/nginx.conf:ro"
+      - "/configs/nginx/nginx.config:/etc/nginx/nginx.conf:ro"
     networks:
       - app-network
     depends_on:
