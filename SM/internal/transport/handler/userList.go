@@ -14,8 +14,8 @@ import (
 // @Summary Get list of users
 // @Description Get all users
 // @Produce json
-// @Success 200 {array} handler_output.UserOutput "List of users"
-// @Failure 500 {object} gin.H "Server error"
+// @Success 200 {array} services.User  "List of users"
+// @Failure 500 {object} map[string]interface{} "Server error"
 // @Router /api/users [get]
 func GetUserList(log *slog.Logger, sp *services.ServicesParams) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -40,8 +40,8 @@ func GetUserList(log *slog.Logger, sp *services.ServicesParams) gin.HandlerFunc 
 // @Accept       json
 // @Produce      json
 // @Param        role   path      string  true  "Users role" format(id)
-// @Success 	 200 {array} handler_output.UserOutput "List of users with role"
-// @Failure      400  {object}  gin.H "invalid data"
+// @Success 	 200 {array} services.User "List of users with role"
+// @Failure      400  {object} map[string]interface{} "invalid data"
 // @Router       /api/users/{role} [get]
 func GetUserListByRole(log *slog.Logger, sp *services.ServicesParams) gin.HandlerFunc {
 	return func(c *gin.Context) {

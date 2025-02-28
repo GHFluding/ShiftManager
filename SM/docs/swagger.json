@@ -54,19 +54,70 @@
                     "204": {
                         "description": "No connection",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "400": {
                         "description": "invalid data",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "404": {
                         "description": "missing id",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/shift/workers/": {
+            "post": {
+                "description": "create new shift worker in db.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "shift worker"
+                ],
+                "summary": "create a shift worker",
+                "parameters": [
+                    {
+                        "description": "Task data",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.addWorkerDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/services.ShiftWorker"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Failed",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -88,14 +139,205 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/handler_output.ShiftOutput"
+                                "$ref": "#/definitions/services.Shift"
                             }
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/task/": {
+            "post": {
+                "description": "create new shift in db.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "shift"
+                ],
+                "summary": "create a shift",
+                "parameters": [
+                    {
+                        "description": "Shift data",
+                        "name": "shift",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.createShiftDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/services.Shift"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Failed",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/task/{id}": {
+            "delete": {
+                "description": "Delete a task:id from the database.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Delete task",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No connection",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "invalid data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "missing id",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "commands for update task: inProgress, completed, verified, failed",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "task"
+                ],
+                "summary": "update task task by command",
+                "parameters": [
+                    {
+                        "description": "Task data",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.updateTaskDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Successfully",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Failed",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/": {
+            "post": {
+                "description": "create new user in db.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "create a user",
+                "parameters": [
+                    {
+                        "description": "User data",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.createUserDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/services.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Failed",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -114,14 +356,15 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/handler_output.UserOutput"
+                                "$ref": "#/definitions/services.User"
                             }
                         }
                     },
                     "500": {
                         "description": "Server error",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -156,14 +399,15 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/postgres.ShiftWorker"
+                                "$ref": "#/definitions/services.ShiftWorker"
                             }
                         }
                     },
                     "400": {
                         "description": "invalid data",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -193,19 +437,22 @@
                     "204": {
                         "description": "No connection",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "400": {
                         "description": "invalid data",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "404": {
                         "description": "missing id",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -240,14 +487,15 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/handler_output.UserOutput"
+                                "$ref": "#/definitions/services.User"
                             }
                         }
                     },
                     "400": {
                         "description": "invalid data",
                         "schema": {
-                            "$ref": "#/definitions/gin.H"
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -255,11 +503,63 @@
         }
     },
     "definitions": {
-        "gin.H": {
+        "handler.addWorkerDTO": {
             "type": "object",
-            "additionalProperties": {}
+            "properties": {
+                "shiftId": {
+                    "type": "integer"
+                },
+                "workerid": {
+                    "type": "integer"
+                }
+            }
         },
-        "handler_output.ShiftOutput": {
+        "handler.createShiftDTO": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "machineid": {
+                    "type": "integer"
+                },
+                "shiftmaster": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.createUserDTO": {
+            "type": "object",
+            "properties": {
+                "bitrixid": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.updateTaskDTO": {
+            "type": "object",
+            "properties": {
+                "command": {
+                    "type": "string"
+                },
+                "comment": {
+                    "type": "string"
+                },
+                "userid": {
+                    "type": "integer"
+                }
+            }
+        },
+        "services.Shift": {
             "type": "object",
             "properties": {
                 "createdat": {
@@ -282,7 +582,29 @@
                 }
             }
         },
-        "handler_output.UserOutput": {
+        "services.ShiftTask": {
+            "type": "object",
+            "properties": {
+                "shiftid": {
+                    "type": "integer"
+                },
+                "taskid": {
+                    "type": "integer"
+                }
+            }
+        },
+        "services.ShiftWorker": {
+            "type": "object",
+            "properties": {
+                "shiftid": {
+                    "type": "integer"
+                },
+                "userid": {
+                    "type": "integer"
+                }
+            }
+        },
+        "services.User": {
             "type": "object",
             "properties": {
                 "bitrixid": {
@@ -296,28 +618,6 @@
                 },
                 "role": {
                     "type": "string"
-                }
-            }
-        },
-        "postgres.ShiftTask": {
-            "type": "object",
-            "properties": {
-                "shiftid": {
-                    "type": "integer"
-                },
-                "taskid": {
-                    "type": "integer"
-                }
-            }
-        },
-        "postgres.ShiftWorker": {
-            "type": "object",
-            "properties": {
-                "shiftid": {
-                    "type": "integer"
-                },
-                "userid": {
-                    "type": "integer"
                 }
             }
         }

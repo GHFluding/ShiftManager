@@ -71,7 +71,14 @@ func Run() {
 		shiftGroup.GET("/", handler.GetShiftList(log, handlerParams))
 		shiftGroup.GET("/active/", handler.GetActiveShiftList(log, handlerParams))
 		shiftGroup.GET("/tasks/", handler.GetShiftTaskList(log, handlerParams))
+		shiftGroup.DELETE("/:shiftid/taskid/:taskid", handler.DeleteShiftTask(log, handlerParams))
+		shiftGroup.DELETE("/:shiftid/workerid/:userid", handler.DeleteShiftWorker(log, handlerParams))
 		shiftGroup.GET("/workers/", handler.GetShiftWorkersList(log, handlerParams))
+		shiftGroup.POST("/", handler.CreateShift(log, handlerParams))
 	}
-
+	taskGroup := r.Group("/api/task")
+	{
+		taskGroup.POST("/", handler.CreateShift(log, handlerParams))
+		taskGroup.PATCH("/{id}", handler.UpdateTask(log, handlerParams))
+	}
 }

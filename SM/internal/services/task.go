@@ -9,6 +9,42 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type UpdateTaskParams struct {
+	UserID  int64
+	Comment string
+	Status  string
+}
+
+func UpdateTask(sp *ServicesParams, reqId int64, reqParams UpdateTaskParams) error {
+	userValid := true
+	if reqParams.UserID == 0 {
+		userValid = false
+	}
+	commentValid := true
+	if reqParams.Comment == "" {
+		commentValid = false
+	}
+	updateParams := postgres.UpdateTaskStatusParams{
+		Taskid: reqId,
+		Status: postgres.Taskstatus(reqParams.Status),
+		Comment: pgtype.Text{
+			String: reqParams.Status,
+			Valid:  commentValid,
+		},
+		Userid: pgtype.Int8{
+			Int64: reqParams.UserID,
+			Valid: userValid,
+		},
+	}
+	err := sp.db.UpdateTaskStatus(context.Background(), updateParams)
+	return err
+}
+
+func DeleteTask(sp *ServicesParams, id int64) error {
+	err := sp.db.DeleteTask(context.Background(), id)
+	return err
+}
+
 func CreateTask(sp *ServicesParams, req Task) (Task, error) {
 	taskParams := convertCreateTaskParams(req)
 	taskDB, err := sp.db.CreateTask(context.Background(), taskParams)

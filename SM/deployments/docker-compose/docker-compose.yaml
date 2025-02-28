@@ -1,0 +1,65 @@
+services:
+  nginx:
+    env_file:
+      - ../../configs/env/.env
+    image: nginx:stable-alpine
+    container_name: sm_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - "/configs/nginx/nginx.config:/etc/nginx/nginx.conf:ro"
+    networks:
+      - app-network
+    depends_on:
+      - backend
+
+
+  postgres:
+    env_file:
+      - ../../configs/env/.env
+    image: postgres:17
+    container_name: sm_postgres
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:    
+    env_file:
+      - ../../configs/env/.env
+    build:
+      context: ../../../SM/
+      dockerfile: ./build/Dockerfile
+    container_name: sm_app
+    environment:
+      ENV: ${ENV}
+      STORAGE_HOST: sm_postgres
+      STORAGE_PORT: ${DB_PORT}
+      STORAGE_USER: ${DB_USER}
+      STORAGE_PASSWORD: ${DB_PASSWORD}
+      STORAGE_DBNAME: ${DB_NAME}
+      HTTP_SERVER_ADDRESS: ${HTTP_SERVER_ADDRESS}
+      HTTP_SERVER_TIMEOUT: ${HTTP_SERVER_TIMEOUT}
+      HTTP_SERVER_IDLE_TIMEOUT: ${HTTP_SERVER_IDLE_TIMEOUT}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app-network
+
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge
