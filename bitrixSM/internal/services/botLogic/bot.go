@@ -40,15 +40,10 @@ func (h *BotHandler) WebhookHandler(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid message data"})
 			return
 		}
-		h.handleMessage(message)
+		h.handleMessage(c)
 
 	case "ONTASKADD":
-		var task b24models.Task
-		if err := json.Unmarshal(event.Data, &task); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid task data"})
-			return
-		}
-		h.handleTask(task)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "this bot can't make task on b24"})
 
 	default:
 		c.JSON(http.StatusOK, gin.H{"status": "unhandled event type"})
@@ -57,16 +52,29 @@ func (h *BotHandler) WebhookHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "processed"})
 }
 
-func (h *BotHandler) handleMessage(msg b24models.ImMessage) {
-	//TODO
-}
+func (h *BotHandler) handleMessage(c *gin.Context) {
+	var event struct {
+		Data struct {
+			DialogID string `json:"DIALOG_ID"`
+			Message  string `json:"MESSAGE"`
+			UserID   int    `json:"USER_ID"`
+		}
+	}
 
-func (h *BotHandler) handleTask(msg b24models.Task) {
-	//TODO
-}
+	if err := c.BindJSON(&event); err != nil {
+		c.JSON(400, gin.H{"error": "invalid payload"})
+		return
+	}
 
-func (h *BotHandler) createTaskFromMessage(msg b24models.ImMessage) {
-	//TODO
+	// maybe refactor
+	switch event.Data.Message {
+	case "/start":
+		//TODO: send welcome message
+	case "/create_task":
+		//TODO: create task handler
+	default:
+		//error
+	}
 }
 
 func (h *BotHandler) sendMessage(dialogID, text string) error {
@@ -77,4 +85,15 @@ func (h *BotHandler) sendMessage(dialogID, text string) error {
 
 	var response interface{}
 	return h.BitrixClient.CallMethod("im.message.add", params, &response)
+}
+
+func (h *BotHandler) checkUserRole(dialogID string, userID int) {
+
+	user, err := h.BitrixClient.GetUser(userID)
+	if err != nil {
+		h.sendMessage(dialogID, "Ошибка получения данных пользователя")
+		return
+	}
+	//TODO: check user role
+	_ = user.ID
 }
