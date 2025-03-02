@@ -2,6 +2,7 @@ package bot
 
 import (
 	b24models "bsm/internal/models/b24"
+	handler "bsm/internal/transport/handlers"
 	"encoding/json"
 	"net/http"
 
@@ -71,7 +72,7 @@ func (h *BotHandler) handleMessage(c *gin.Context) {
 	case "/start":
 		//TODO: send welcome message
 	case "/create_task":
-		//TODO: create task handler
+		handler.CreateTask(c)
 	default:
 		//error
 	}

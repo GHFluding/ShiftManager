@@ -60,6 +60,7 @@ func Run() {
 		usersGroup.POST("/", handler.CreateUser(log, handlerParams))
 		usersGroup.GET("/:role", handler.GetUserListByRole(log, handlerParams))
 		usersGroup.DELETE("/:id", handler.DeleteUser(log, handlerParams))
+		usersGroup.GET("/:id", handler.CheckUserRoleHandler(log, handlerParams))
 	}
 	machineGroup := r.Group("/api/machine")
 	{

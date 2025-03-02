@@ -1,8 +1,8 @@
 -- name: CreateTask :one
 INSERT INTO Tasks(
-    id, machineId, shiftId, frequency, taskPriority, description, createdBy, createdAt
+    machineId, shiftId, frequency, taskPriority, description, createdBy, createdAt
 ) VALUES (
-    @id, @machineId, @shiftId, @frequency, @taskPriority, @description, @createdBy, CURRENT_DATE
+    @machineId, @shiftId, @frequency, @taskPriority, @description, @createdBy, CURRENT_DATE
 )
 RETURNING *;
 -- name: DeleteTask :exec

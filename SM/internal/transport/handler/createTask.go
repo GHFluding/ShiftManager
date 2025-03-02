@@ -11,7 +11,6 @@ import (
 )
 
 type createTaskDTO struct {
-	ID           int64  `json:"id"`
 	Machineid    int64  `json:"machineid"`
 	Shiftid      int64  `json:"shiftid" `
 	Frequency    string `json:"frequency"`
@@ -68,7 +67,6 @@ func parseCreateTaskRequest(c *gin.Context, log *slog.Logger) (createTaskDTO, er
 }
 func convertTaskForServices(req createTaskDTO) services.Task {
 	return services.Task{
-		ID:           req.ID,
 		Machineid:    req.Machineid,
 		Shiftid:      req.Shiftid,
 		Frequency:    req.Frequency,

@@ -13,15 +13,14 @@ import (
 
 const createTask = `-- name: CreateTask :one
 INSERT INTO Tasks(
-    id, machineId, shiftId, frequency, taskPriority, description, createdBy, createdAt
+    machineId, shiftId, frequency, taskPriority, description, createdBy, createdAt
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, CURRENT_DATE
+    $1, $2, $3, $4, $5, $6, CURRENT_DATE
 )
 RETURNING id, machineid, shiftid, frequency, taskpriority, description, createdby, createdat, verifiedby, verifiedat, completedby, completedat, status, comment, movedinprogressby, movedinprogressat
 `
 
 type CreateTaskParams struct {
-	ID           int64
 	Machineid    int64
 	Shiftid      pgtype.Int8
 	Frequency    Taskfrequency
@@ -32,7 +31,6 @@ type CreateTaskParams struct {
 
 func (q *Queries) CreateTask(ctx context.Context, arg CreateTaskParams) (Task, error) {
 	row := q.db.QueryRow(ctx, createTask,
-		arg.ID,
 		arg.Machineid,
 		arg.Shiftid,
 		arg.Frequency,

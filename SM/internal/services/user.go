@@ -90,3 +90,11 @@ func detectUserRole(sRole string) (postgres.Userrole, bool) {
 		return postgres.Userrole(""), false
 	}
 }
+
+func CheckUserRole(sp *ServicesParams, userId int64) (string, error) {
+	user, err := sp.db.CheckUserRole(context.Background(), userId)
+	if err != nil {
+		return "", err
+	}
+	return string(user.Role), err
+}
