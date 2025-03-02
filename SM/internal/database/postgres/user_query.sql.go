@@ -26,6 +26,23 @@ func (q *Queries) ChangeUserRole(ctx context.Context, arg ChangeUserRoleParams) 
 	return err
 }
 
+const checkUserRole = `-- name: CheckUserRole :one
+SELECT id, bitrixid, name, role FROM Users
+WHERE id = $1
+`
+
+func (q *Queries) CheckUserRole(ctx context.Context, id int64) (User, error) {
+	row := q.db.QueryRow(ctx, checkUserRole, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Bitrixid,
+		&i.Name,
+		&i.Role,
+	)
+	return i, err
+}
+
 const createUser = `-- name: CreateUser :one
 INSERT INTO Users(
     id, bitrixid, name, role 
