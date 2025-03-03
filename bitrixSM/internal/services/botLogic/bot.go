@@ -70,9 +70,20 @@ func (h *BotHandler) handleMessage(c *gin.Context) {
 	// maybe refactor
 	switch event.Data.Message {
 	case "/start":
-		//TODO: send welcome message
+		const helloString = "Напишите /help для получения списка команда"
+		h.sendMessage(event.Data.DialogID, helloString)
+	case "/help":
+		const commandList = `/create_task - создает задание
+		`
+		h.sendMessage(event.Data.DialogID, commandList)
 	case "/create_task":
-		handler.CreateTask(c)
+		err := handler.CreateTask(c)
+		if err != nil {
+			h.sendMessage(event.Data.DialogID, err.Error())
+		} else {
+			//task created successfully
+			h.sendMessage(event.Data.DialogID, "задание успешно созданно ")
+		}
 	default:
 		//error
 	}
@@ -86,15 +97,4 @@ func (h *BotHandler) sendMessage(dialogID, text string) error {
 
 	var response interface{}
 	return h.BitrixClient.CallMethod("im.message.add", params, &response)
-}
-
-func (h *BotHandler) checkUserRole(dialogID string, userID int) {
-
-	user, err := h.BitrixClient.GetUser(userID)
-	if err != nil {
-		h.sendMessage(dialogID, "Ошибка получения данных пользователя")
-		return
-	}
-	//TODO: check user role
-	_ = user.ID
 }
