@@ -20,3 +20,6 @@ ORDER BY id;
 Select * FROM Users
 WHERE role = @role
 ORDER BY id;
+-- name: CheckUserRole :one
+SELECT * FROM Users
+WHERE id = @id;

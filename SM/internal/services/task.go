@@ -75,7 +75,6 @@ func convertCreateTaskParams(req Task) postgres.CreateTaskParams {
 		}
 	}
 	return postgres.CreateTaskParams{
-		ID:           req.ID,
 		Machineid:    req.Machineid,
 		Shiftid:      shiftid,
 		Frequency:    postgres.Taskfrequency(req.Frequency),
