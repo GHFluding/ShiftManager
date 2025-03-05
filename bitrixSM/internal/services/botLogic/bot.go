@@ -54,35 +54,30 @@ func (h *BotHandler) WebhookHandler(c *gin.Context) {
 }
 
 func (h *BotHandler) handleMessage(c *gin.Context) {
-	var event struct {
-		Data struct {
-			DialogID string `json:"DIALOG_ID"`
-			Message  string `json:"MESSAGE"`
-			UserID   int    `json:"USER_ID"`
-		}
-	}
-
-	if err := c.BindJSON(&event); err != nil {
-		c.JSON(400, gin.H{"error": "invalid payload"})
+	h.ExtractMessageData()(c)
+	if c.IsAborted() {
 		return
 	}
 
+	message := c.GetString("message")
+	dialogID := c.GetString("dialogID")
+
 	// maybe refactor
-	switch event.Data.Message {
+	switch message {
 	case "/start":
 		const helloString = "Напишите /help для получения списка команда"
-		h.sendMessage(event.Data.DialogID, helloString)
+		h.sendMessage(dialogID, helloString)
 	case "/help":
 		const commandList = `/create_task - создает задание
 		`
-		h.sendMessage(event.Data.DialogID, commandList)
+		h.sendMessage(dialogID, commandList)
 	case "/create_task":
 		err := handler.CreateTask(c)
 		if err != nil {
-			h.sendMessage(event.Data.DialogID, err.Error())
+			h.sendMessage(dialogID, err.Error())
 		} else {
 			//task created successfully
-			h.sendMessage(event.Data.DialogID, "задание успешно созданно ")
+			h.sendMessage(dialogID, "задание успешно созданно ")
 		}
 	default:
 		//error
@@ -97,4 +92,29 @@ func (h *BotHandler) sendMessage(dialogID, text string) error {
 
 	var response interface{}
 	return h.BitrixClient.CallMethod("im.message.add", params, &response)
+}
+
+// middleware to data
+func (h *BotHandler) ExtractMessageData() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var event struct {
+			Data struct {
+				DialogID string `json:"DIALOG_ID"`
+				Message  string `json:"MESSAGE"`
+				UserID   int    `json:"USER_ID"`
+			}
+		}
+
+		if err := c.BindJSON(&event); err != nil {
+			c.AbortWithStatusJSON(400, gin.H{"error": "invalid payload"})
+			return
+		}
+
+		// save data to context
+		c.Set("dialogID", event.Data.DialogID)
+		c.Set("message", event.Data.Message)
+		c.Set("userID", event.Data.UserID)
+
+		c.Next()
+	}
 }
