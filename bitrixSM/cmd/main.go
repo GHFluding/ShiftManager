@@ -1,26 +1,32 @@
-package bsm
+package main
 
 import (
-	"fmt"
+	apilogic "bsm/internal/services/apiLogic"
+	"log"
 
 	"github.com/gin-gonic/gin"
+	goBX24 "github.com/whatcrm/go-bitrix24"
 )
 
 func main() {
-	//TODO: init logger
-	webhookURL := "https://your-bitrix-portal.bitrix24.ru/rest/1/WEBHOOK_TOKEN"
-	secret := "your_webhook_secret"
+	// New API client
+	const (
+		clientID     = "example-client-id"
+		clientSecret = "example-client-secret"
+		domain       = "example-bitrix24-domain"
+		auth         = "example-auth-token"
+	)
 
-	bitrixClient := bitrix.NewClient(webhookURL)
-	botHandler := bot.NewBotHandler(bitrixClient, secret)
+	b24 := goBX24.NewAPI(clientID, clientSecret)
+	if err := b24.SetOptions(domain, auth, true); err != nil {
+		log.Fatalf("Setting API error: %v", err)
+	}
 
-	// TODO: inti kafka
-
-	//TODO: rework
 	r := gin.Default()
-	r.POST("/bitrix/webhook", botHandler.WebhookHandler)
+	// Handling incoming message
+	r.POST("/webhook", apilogic.HandleMessage)
 
 	if err := r.Run(":8080"); err != nil {
-		panic(fmt.Sprintf("Failed to start server: %v", err))
+		log.Fatalf("Run server error: %v", err)
 	}
 }
