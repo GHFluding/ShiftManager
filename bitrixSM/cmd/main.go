@@ -2,6 +2,7 @@ package main
 
 import (
 	apilogic "bsm/internal/services/apiLogic"
+	"bsm/internal/services/logger"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -21,12 +22,12 @@ func main() {
 	if err := b24.SetOptions(domain, auth, true); err != nil {
 		log.Fatalf("Setting API error: %v", err)
 	}
-
+	log := logger.Setup("local")
 	r := gin.Default()
 	// Handling incoming message
-	r.POST("/webhook", apilogic.HandleMessage)
+	r.POST("/webhook", apilogic.HandleMessage(log))
 
 	if err := r.Run(":8080"); err != nil {
-		log.Fatalf("Run server error: %v", err)
+		log.Info("Run server error: ", logger.ErrToAttr(err))
 	}
 }
