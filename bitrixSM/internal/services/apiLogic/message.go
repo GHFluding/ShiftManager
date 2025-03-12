@@ -67,11 +67,16 @@ func spreadingMessage(msg IncomingMessage, log *slog.Logger) {
 
 }
 
+type sendingMessage struct {
+	dialogId int    `json:"DIALOG_ID"`
+	message  string `json:"MESSAGE"`
+}
+
 func sendMessageToBitrix(chatID int, message string) error {
 	url := "https:/example-domain.bitrix24.ru/rest/1/example-webhook-token/im.message.add"
-	data := map[string]interface{}{
-		"DIALOG_ID": chatID,
-		"MESSAGE":   message,
+	data := sendingMessage{
+		dialogId: chatID,
+		message:  message,
 	}
 
 	jsonData, err := json.Marshal(data)

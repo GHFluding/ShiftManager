@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bsm/internal/config/structures/variables"
 	apilogic "bsm/internal/services/apiLogic"
 	"bsm/internal/services/logger"
 	"log"
@@ -10,16 +11,15 @@ import (
 )
 
 func main() {
-	// New API client
-	const (
-		clientID     = "example-client-id"
-		clientSecret = "example-client-secret"
-		domain       = "example-bitrix24-domain"
-		auth         = "example-auth-token"
+	// TODO: init config loading and making webhook struct with data of .env file
+	webhook := variables.WebhookInit(
+		"example-client-id",
+		"example-client-secret",
+		"example-bitrix24-domain",
+		"example-auth-token",
 	)
-
-	b24 := goBX24.NewAPI(clientID, clientSecret)
-	if err := b24.SetOptions(domain, auth, true); err != nil {
+	b24 := goBX24.NewAPI(webhook.GetID(), webhook.GetSecret())
+	if err := b24.SetOptions(webhook.GetDomain(), webhook.GetAuthToken(), true); err != nil {
 		log.Fatalf("Setting API error: %v", err)
 	}
 	log := logger.Setup("local")
