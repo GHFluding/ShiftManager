@@ -4,7 +4,7 @@ SM/configs/env/.env
 .vscode
 vendor
 SM/docs.go
-
+.env
 # http://www.gnu.org/software/automake
 
 Makefile.in

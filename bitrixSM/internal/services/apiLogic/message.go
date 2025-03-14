@@ -1,6 +1,7 @@
 package apilogic
 
 import (
+	config "bsm/internal/config/loadconfig"
 	bot_command "bsm/internal/services/command"
 	"bytes"
 	"encoding/json"
@@ -23,7 +24,7 @@ type IncomingMessage struct {
 	} `json:"message"`
 }
 
-func HandleMessage(log *slog.Logger) gin.HandlerFunc {
+func HandleMessage(cfg *config.Config, log *slog.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var msg IncomingMessage
 		if err := c.ShouldBindJSON(&msg); err != nil {
@@ -31,13 +32,13 @@ func HandleMessage(log *slog.Logger) gin.HandlerFunc {
 			return
 		}
 
-		spreadingMessage(msg, log)
+		spreadingMessage(cfg, msg, log)
 
 		c.JSON(http.StatusOK, gin.H{"status": "received"})
 	}
 }
 
-func spreadingMessage(msg IncomingMessage, log *slog.Logger) {
+func spreadingMessage(cfg *config.Config, msg IncomingMessage, log *slog.Logger) {
 	parts := strings.Fields(msg.Message.Text)
 	if len(parts) == 0 {
 		return
@@ -50,26 +51,43 @@ func spreadingMessage(msg IncomingMessage, log *slog.Logger) {
 		resp := bot_command.Help(log)
 		sendMessageToBitrix(int(msg.Message.Chat.ID), resp)
 	case "/create-task":
-		err := bot_command.CreateTask(args, log)
+		err := bot_command.CreateTask(cfg.Webhooks.GetCreateTaskUrl(), args, log)
 		if err != nil {
 			sendMessageToBitrix(int(msg.Message.Chat.ID), "Ошибка выполнения команды по созданию задания")
 		} else {
 			sendMessageToBitrix(int(msg.Message.Chat.ID), "Задание успешно добавлено")
 		}
 	case "/shift-list":
-		list, err := bot_command.ShiftList(args, log)
+		list, err := bot_command.ShiftList(cfg.Webhooks.GetShiftListUrl(), log)
 		if err != nil {
-			sendMessageToBitrix(int(msg.Message.Chat.ID), "Ошибка выполения команды по получению списка смен")
+			sendMessageToBitrix(int(msg.Message.Chat.ID), "Ошибка выполения команды для получения списка смен")
 		} else {
 			sendMessageToBitrix(int(msg.Message.Chat.ID), "Список смен:\n"+list)
 		}
+	case "/create-shift":
+		resp, err := bot_command.CreateShift(cfg.Webhooks.GetCreateShiftUrl(), args, log)
+		if err != nil {
+			sendMessageToBitrix(int(msg.Message.Chat.ID), "Ошибка выполения команды для создания смены смен")
+		} else {
+			sendMessageToBitrix(int(msg.Message.Chat.ID), "Смена упешно создана:\n"+resp)
+		}
+	case "/add-worker":
+		resp, err := bot_command.AddShiftWorker(cfg.Webhooks.GETAddShiftWorkerURL(), args, log)
+		if err != nil {
+			sendMessageToBitrix(int(msg.Message.Chat.ID), "Ошибка выполения команды добавления работника на смену")
+		} else {
+			sendMessageToBitrix(int(msg.Message.Chat.ID), "Работник успешно добавлен:\n"+resp)
+		}
+
+	default:
+		sendMessageToBitrix(int(msg.Message.Chat.ID), "Неверная команда, отправте /help для получения списка команд")
 	}
 
 }
 
 type sendingMessage struct {
-	dialogId int    `json:"DIALOG_ID"`
-	message  string `json:"MESSAGE"`
+	dialogId int
+	message  string
 }
 
 func sendMessageToBitrix(chatID int, message string) error {

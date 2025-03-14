@@ -1,7 +1,6 @@
 package config
 
 import (
-	"bsm/internal/config/structures/variables"
 	"log"
 	"os"
 
@@ -9,8 +8,9 @@ import (
 )
 
 type Config struct {
-	Env     string
-	Webhook variables.Webhook
+	Env        string
+	WebhookB24 WebhookB24
+	Webhooks   WebhookList
 }
 
 func MustLoad() *Config {
@@ -20,14 +20,22 @@ func MustLoad() *Config {
 	}
 	env := getEnv("ENV")
 
-	webhook := variables.WebhookInit(
+	webhook := WebhookB24Init(
 		getEnv("WEBHOOK_ID"),
 		getEnv("WEBHOOK_SECRET"),
 		getEnv("WEBHOOK_DOMAIN"),
-		getEnv("WEBHOOK_TOKEN"))
+		getEnv("WEBHOOK_TOKEN"),
+		getEnv("WEBHOOK_URL"))
+	webhooks := WebhookList{
+		createShift:    getEnv("CREATE_SHIFT_WEBHOOK"),
+		createTask:     getEnv("CREATE_TASK_WEBHOOK"),
+		shiftList:      getEnv("SHIFT_LIST_WEBHOOK"),
+		addShiftWorker: getEnv("ADD_SHIFT_WORKER_WEBHOOK"),
+	}
 	cfg := &Config{
-		Env:     env,
-		Webhook: webhook,
+		Env:        env,
+		WebhookB24: webhook,
+		Webhooks:   webhooks,
 	}
 
 	return cfg

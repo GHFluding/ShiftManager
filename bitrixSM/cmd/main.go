@@ -1,7 +1,8 @@
 package main
 
 import (
-	"bsm/internal/config/structures/variables"
+	config "bsm/internal/config/loadconfig"
+
 	apilogic "bsm/internal/services/apiLogic"
 	"bsm/internal/services/logger"
 	"log"
@@ -12,11 +13,13 @@ import (
 
 func main() {
 	// TODO: init config loading and making webhook struct with data of .env file
-	webhook := variables.WebhookInit(
+	cfg := config.MustLoad()
+	webhook := config.WebhookB24Init(
 		"example-client-id",
 		"example-client-secret",
 		"example-bitrix24-domain",
 		"example-auth-token",
+		"example-url",
 	)
 	b24 := goBX24.NewAPI(webhook.GetID(), webhook.GetSecret())
 	if err := b24.SetOptions(webhook.GetDomain(), webhook.GetAuthToken(), true); err != nil {
@@ -24,8 +27,9 @@ func main() {
 	}
 	log := logger.Setup("local")
 	r := gin.Default()
+	webhookURL := webhook.GetURL()
 	// Handling incoming message
-	r.POST("/webhook", apilogic.HandleMessage(log))
+	r.POST(webhookURL, apilogic.HandleMessage(cfg, log))
 
 	if err := r.Run(":8080"); err != nil {
 		log.Info("Run server error: ", logger.ErrToAttr(err))
