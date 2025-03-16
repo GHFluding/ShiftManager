@@ -39,6 +39,8 @@ type WebhookList struct {
 	shiftList      string
 	createTask     string
 	addShiftWorker string
+	taskList       string
+	addMachine     string
 }
 
 func (w *WebhookList) GetCreateShiftUrl() string {
@@ -52,4 +54,10 @@ func (w *WebhookList) GetCreateTaskUrl() string {
 }
 func (w *WebhookList) GETAddShiftWorkerURL() string {
 	return w.addShiftWorker
+}
+func (w *WebhookList) GETTaskListURL() string {
+	return w.addShiftWorker
+}
+func (w *WebhookList) GETAddMachineURL() string {
+	return w.addMachine
 }

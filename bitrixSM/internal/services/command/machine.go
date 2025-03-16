@@ -5,7 +5,7 @@ import (
 	"log/slog"
 )
 
-func AddMachine(webhookURL string, args []string, log *slog.Logger) (string, error) {
+func AddShiftWorker(webhookURL string, args []string, log *slog.Logger) (string, error) {
 	resp, err := sendPostRequest(webhookURL, args)
 	if err != nil {
 		log.Info("error in receiving ShiftList response: ", logger.ErrToAttr(err))

@@ -78,7 +78,20 @@ func spreadingMessage(cfg *config.Config, msg IncomingMessage, log *slog.Logger)
 		} else {
 			sendMessageToBitrix(int(msg.Message.Chat.ID), "Работник успешно добавлен:\n"+resp)
 		}
-
+	case "/task-list":
+		resp, err := bot_command.GetTaskList(cfg.Webhooks.GETTaskListURL(), log)
+		if err != nil {
+			sendMessageToBitrix(int(msg.Message.Chat.ID), "Ошибка выполения команды получения списка заданий")
+		} else {
+			sendMessageToBitrix(int(msg.Message.Chat.ID), "Список заданий:\n"+resp)
+		}
+	case "/add-machine":
+		resp, err := bot_command.AddMachine(cfg.Webhooks.GETAddMachineURL(), args, log)
+		if err != nil {
+			sendMessageToBitrix(int(msg.Message.Chat.ID), "Ошибка выполения команды добавления работника на смену")
+		} else {
+			sendMessageToBitrix(int(msg.Message.Chat.ID), "Работник успешно добавлен:\n"+resp)
+		}
 	default:
 		sendMessageToBitrix(int(msg.Message.Chat.ID), "Неверная команда, отправте /help для получения списка команд")
 	}

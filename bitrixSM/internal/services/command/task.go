@@ -15,3 +15,12 @@ func CreateTask(webhookURL string, args []string, log *slog.Logger) error {
 	log.Info("CreateTask request was successful.")
 	return nil
 }
+
+func GetTaskList(webhookURL string, log *slog.Logger) (string, error) {
+	resp, err := sendGetListRequest(webhookURL)
+	if err != nil {
+		log.Info("error in receiving TaskList")
+		return "", err
+	}
+	return resp, nil
+}
