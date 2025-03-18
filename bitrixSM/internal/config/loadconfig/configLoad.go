@@ -27,12 +27,7 @@ func MustLoad() *Config {
 		getEnv("WEBHOOK_TOKEN"),
 		getEnv("WEBHOOK_URL"))
 	webhooks := WebhookList{
-		createShift:    getEnv("CREATE_SHIFT_WEBHOOK"),
-		createTask:     getEnv("CREATE_TASK_WEBHOOK"),
-		shiftList:      getEnv("SHIFT_LIST_WEBHOOK"),
-		addShiftWorker: getEnv("ADD_SHIFT_WORKER_WEBHOOK"),
-		taskList:       getEnv("TASK_LIST_WEBHOOK"),
-		addMachine:     getEnv("ADD_MACHINE_WEBHOOK"),
+		baseURL: getEnv("BASE_URL"),
 	}
 	cfg := &Config{
 		Env:        env,

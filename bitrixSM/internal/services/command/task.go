@@ -5,7 +5,8 @@ import (
 	"log/slog"
 )
 
-func CreateTask(webhookURL string, args []string, log *slog.Logger) error {
+func CreateTask(baseURL string, args []string, log *slog.Logger) error {
+	webhookURL := baseURL + "/task"
 	resp, err := sendPostRequest(webhookURL, args)
 	if err != nil {
 		log.Info("error in receiving CreateTask response: ", logger.ErrToAttr(err))

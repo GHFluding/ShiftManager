@@ -35,29 +35,9 @@ func (w *WebhookB24) GetURL() string {
 }
 
 type WebhookList struct {
-	createShift    string
-	shiftList      string
-	createTask     string
-	addShiftWorker string
-	taskList       string
-	addMachine     string
+	baseURL string
 }
 
-func (w *WebhookList) GetCreateShiftUrl() string {
-	return w.createShift
-}
-func (w *WebhookList) GetShiftListUrl() string {
-	return w.shiftList
-}
-func (w *WebhookList) GetCreateTaskUrl() string {
-	return w.createTask
-}
-func (w *WebhookList) GETAddShiftWorkerURL() string {
-	return w.addShiftWorker
-}
-func (w *WebhookList) GETTaskListURL() string {
-	return w.addShiftWorker
-}
-func (w *WebhookList) GETAddMachineURL() string {
-	return w.addMachine
+func (w *WebhookList) GETBaseURL() string {
+	return w.baseURL
 }

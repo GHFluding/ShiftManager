@@ -5,7 +5,8 @@ import (
 	"log/slog"
 )
 
-func CreateShift(webhookURL string, args []string, log *slog.Logger) (string, error) {
+func CreateShift(baseURL string, args []string, log *slog.Logger) (string, error) {
+	webhookURL := baseURL + "/shift"
 	resp, err := sendPostRequest(webhookURL, args)
 	if err != nil {
 		log.Info("error in receiving ShiftList response: ", logger.ErrToAttr(err))
@@ -14,7 +15,8 @@ func CreateShift(webhookURL string, args []string, log *slog.Logger) (string, er
 	return resp, err
 }
 
-func ShiftList(webhookURL string, log *slog.Logger) (string, error) {
+func ShiftList(baseURL string, log *slog.Logger) (string, error) {
+	webhookURL := baseURL + "/shift"
 	resp, err := sendGetListRequest(webhookURL)
 	if err != nil {
 		log.Info("error in receiving ShiftList response: ", logger.ErrToAttr(err))
