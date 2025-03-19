@@ -41,8 +41,8 @@ type sendingMessage struct {
 	Message  string
 }
 
-func sendMessageToBitrix(chatID int, message string) error {
-	url := "https:/example-domain.bitrix24.ru/rest/1/example-webhook-token/im.message.add"
+func sendMessageToBitrix(chatID int, message string, url string) error {
+
 	data := sendingMessage{
 		DialogId: chatID,
 		Message:  message,

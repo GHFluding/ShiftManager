@@ -1,6 +1,7 @@
 package bot_command
 
 import (
+	config "bsm/internal/config/loadconfig"
 	"bsm/internal/services/logger"
 	"log/slog"
 )
@@ -16,7 +17,7 @@ func CreateShift(baseURL string, args []string, log *slog.Logger) (string, error
 }
 
 func ShiftList(baseURL string, log *slog.Logger) (string, error) {
-	webhookURL := baseURL + "/shift"
+	webhookURL := baseURL + config.Routes.Shift
 	resp, err := sendGetListRequest(webhookURL)
 	if err != nil {
 		log.Info("error in receiving ShiftList response: ", logger.ErrToAttr(err))
