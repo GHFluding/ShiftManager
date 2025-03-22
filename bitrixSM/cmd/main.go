@@ -4,7 +4,7 @@ import (
 	config "bsm/internal/config/loadconfig"
 
 	apilogic "bsm/internal/services/apiLogic"
-	"bsm/internal/services/logger"
+	"bsm/internal/utils/logger"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -25,7 +25,7 @@ func main() {
 	if err := b24.SetOptions(webhook.GetDomain(), webhook.GetAuthToken(), true); err != nil {
 		log.Fatalf("Setting API error: %v", err)
 	}
-	log := logger.Setup("local")
+	log := logger.Setup(cfg.Env)
 	r := gin.Default()
 	webhookURL := webhook.GetURL()
 	// Handling incoming message
