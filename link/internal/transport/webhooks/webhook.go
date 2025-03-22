@@ -4,36 +4,39 @@ import (
 	"linkSM/internal/services"
 	logger "linkSM/internal/utils"
 	"log/slog"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 func WebhookMiddleware(log *slog.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		servicesMap := map[string]services.WebhookTransformDataFunc{
-			"example": services.ExampleFunc,
-		}
-		urlPath := c.Request.URL.Path
-		data, err := c.GetRawData()
-		if err != nil {
-			log.Info("Error return data from webhook", logger.ErrToAttr(err))
-			return
-		}
-		f, exists := servicesMap[urlPath]
-		if !exists {
-			log.Info("Missing processing function for this url")
-			return
-		}
-		err = f(data, log)
-		if err != nil {
-			log.Info("Request is failed ", logger.ErrToAttr(err))
-			return
-		}
+
 	}
 }
 
-func WebhookHandler(log *slog.Logger) gin.HandlerFunc {
+// not webhook url is request db url
+func WebhookHandler(log *slog.Logger, processingFunc services.WebhookProcessingFunc, url string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// all processing in middleware
+		data, err := c.GetRawData()
+		if err != nil {
+			log.Error("Failed to read request data", logger.ErrToAttr(err))
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+			return
+		}
+
+		//outData is result of json.Marshal function
+		outData, err := processingFunc(data, log, url)
+		if err != nil {
+			log.Error("Data processing failed", logger.ErrToAttr(err))
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error":   "Data processing error",
+				"details": err.Error(),
+			})
+			return
+		}
+
+		c.Data(http.StatusOK, "application/json", outData)
+
 	}
 }

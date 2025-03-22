@@ -15,9 +15,11 @@ type Webhooks struct {
 	ShiftWorker string
 	ShiftTask   string
 }
+
 type Config struct {
 	Env      string
 	Webhooks Webhooks
+	BaseURL  BaseURL
 }
 
 func MustLoad() *Config {
