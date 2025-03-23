@@ -19,7 +19,7 @@ type Webhooks struct {
 type Config struct {
 	Env      string
 	Webhooks Webhooks
-	BaseURL  BaseURL
+	Routing  Routing
 }
 
 func MustLoad() *Config {

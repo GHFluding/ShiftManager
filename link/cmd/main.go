@@ -17,7 +17,7 @@ func main() {
 	r := gin.Default()
 	webhookTaskGroup := r.Group(cfg.Webhooks.Task)
 	{
-		webhookTaskGroup.POST("/", webhooks.WebhookHandler(log, services.CreateTask, cfg.BaseURL.GetCreateTaskUrl()))
+		webhookTaskGroup.POST("/", webhooks.WebhookHandler(log, services.CreateTask, cfg.Routing.GetTaskBaseURL()))
 	}
 
 	//TODO: init routers
