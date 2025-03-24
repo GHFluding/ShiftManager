@@ -24,65 +24,55 @@ type createTaskParams struct {
 func CreateTask(data []byte, log *slog.Logger, url string) ([]byte, error) {
 	log.Info("Start processing task creation request")
 
-	// map[string]interface{}, because the request may not match the structure
-	var rawData map[string]interface{}
-	if err := json.Unmarshal(data, &rawData); err != nil {
-		log.Error("Failed to unmarshal input data", logger.ErrToAttr(err))
-		return nil, fmt.Errorf("input data parsing failed: %w", err)
-	}
-
-	// validation fields
 	var task createTaskParams
-	var err error
-
-	fields := map[string]interface{}{}
-	for key, converter := range map[string]func() error{
-		"machineid":    func() error { task.Machineid, err = getInt64(rawData, "machineid"); return err },
-		"shiftid":      func() error { task.Shiftid, err = getInt64(rawData, "shiftid"); return err },
-		"frequency":    func() error { task.Frequency, err = getString(rawData, "frequency"); return err },
-		"taskpriority": func() error { task.Taskpriority, err = getString(rawData, "taskpriority"); return err },
-		"description":  func() error { task.Description, err = getString(rawData, "description"); return err },
-		"createdby":    func() error { task.Createdby, err = getInt64(rawData, "createdby"); return err },
-	} {
-		if err := converter(); err != nil {
-			return nil, fmt.Errorf("validation error for field %s: %w", key, err)
-		}
-		fields[key] = rawData[key]
+	if err := json.Unmarshal(data, &task); err != nil {
+		log.Error("JSON unmarshal error", logger.ErrToAttr(err))
+		return nil, fmt.Errorf("invalid request format: %w", err)
 	}
 
-	log.Info("Successfully parsed task data", slog.Any("fields", fields))
+	if task.Machineid == 0 || task.Shiftid == 0 || task.Createdby == 0 {
+		return nil, fmt.Errorf("missing required fields")
+	}
+
+	log.Info("Parsed task data",
+		slog.Int64("machineid", task.Machineid),
+		slog.Int64("shiftid", task.Shiftid),
+		slog.String("frequency", task.Frequency),
+		slog.String("taskpriority", task.Taskpriority),
+		slog.String("description", task.Description),
+		slog.Int64("createdby", task.Createdby))
 
 	requestBody, err := json.Marshal(task)
 	if err != nil {
-		log.Error("Failed to marshal task data", logger.ErrToAttr(err))
-		return nil, fmt.Errorf("task data encoding failed: %w", err)
+		log.Error("JSON marshal error", logger.ErrToAttr(err))
+		return nil, fmt.Errorf("data encoding failed: %w", err)
 	}
-	client := &http.Client{
-		Timeout: 10 * time.Second,
-	}
+
+	client := &http.Client{Timeout: 10 * time.Second}
 	resp, err := client.Post(url, "application/json", bytes.NewReader(requestBody))
 	if err != nil {
 		log.Error("HTTP request failed", logger.ErrToAttr(err))
-		return nil, fmt.Errorf("failed to send request: %w", err)
+		return nil, fmt.Errorf("service unavailable: %w", err)
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		log.Error("Unexpected HTTP status",
+	if resp.StatusCode >= 400 {
+		body, _ := io.ReadAll(resp.Body)
+		log.Error("Service error response",
 			slog.Int("status", resp.StatusCode),
-			slog.String("status_text", resp.Status))
-		return nil, fmt.Errorf("received bad status: %d %s", resp.StatusCode, resp.Status)
+			slog.String("body", string(body)))
+		return nil, fmt.Errorf("service returned %d status", resp.StatusCode)
 	}
 
 	responseData, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Error("Failed to read response body", logger.ErrToAttr(err))
-		return nil, fmt.Errorf("response reading failed: %w", err)
+		log.Error("Failed to read response", logger.ErrToAttr(err))
+		return nil, fmt.Errorf("response read failed: %w", err)
 	}
 
-	log.Info("Successfully processed request",
+	log.Info("Request processed successfully",
 		slog.Int("response_size", len(responseData)),
-		slog.Int("status_code", resp.StatusCode))
+		slog.Int("status", resp.StatusCode))
 
 	return responseData, nil
 }

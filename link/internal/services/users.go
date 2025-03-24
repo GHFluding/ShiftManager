@@ -13,7 +13,7 @@ import (
 )
 
 type createUserParams struct {
-	Bitrixid   *int64 `json:"bitrixid,omitempty"` // Используем указатель и omitempty
+	Bitrixid   *int64 `json:"bitrixid,omitempty"`
 	TelegramID string `json:"telegramid"`
 	Name       string `json:"name"`
 	Role       string `json:"role"`
@@ -22,39 +22,17 @@ type createUserParams struct {
 func CreateUser(data []byte, log *slog.Logger, url string) ([]byte, error) {
 	log.Info("Start processing user creation request")
 
-	var rawData map[string]interface{}
-	if err := json.Unmarshal(data, &rawData); err != nil {
-		log.Error("Failed to unmarshal input data", logger.ErrToAttr(err))
-		return nil, fmt.Errorf("input data parsing failed: %w", err)
+	var user createUserParams
+	if err := json.Unmarshal(data, &user); err != nil {
+		log.Error("JSON unmarshal error", logger.ErrToAttr(err))
+		return nil, fmt.Errorf("invalid request format: %w", err)
 	}
 
-	user := createUserParams{}
-	var err error
-
-	//  validation required fields
-	requiredFields := map[string]func() error{
-		"name":       func() error { user.Name, err = getString(rawData, "name"); return err },
-		"role":       func() error { user.Role, err = getString(rawData, "role"); return err },
-		"telegramid": func() error { user.TelegramID, err = getString(rawData, "telegramid"); return err },
+	if user.Name == "" || user.Role == "" || user.TelegramID == "" {
+		return nil, fmt.Errorf("missing required fields: name, role or telegramid")
 	}
 
-	for key, validator := range requiredFields {
-		if err := validator(); err != nil {
-			return nil, fmt.Errorf("validation error for field %s: %w", key, err)
-		}
-	}
-
-	//  validation optional fields
-	if val, exists := rawData["bitrixid"]; exists {
-		bitrixID, err := getInt64Optional(val)
-		if err != nil {
-			log.Warn("Invalid bitrixid format", logger.ErrToAttr(err))
-		} else {
-			user.Bitrixid = &bitrixID
-		}
-	}
-
-	log.Info("Successfully parsed user data",
+	log.Info("Parsed user data",
 		slog.String("name", user.Name),
 		slog.String("role", user.Role),
 		slog.String("telegramid", user.TelegramID),
@@ -62,37 +40,35 @@ func CreateUser(data []byte, log *slog.Logger, url string) ([]byte, error) {
 
 	requestBody, err := json.Marshal(user)
 	if err != nil {
-		log.Error("Failed to marshal user data", logger.ErrToAttr(err))
-		return nil, fmt.Errorf("user data encoding failed: %w", err)
+		log.Error("JSON marshal error", logger.ErrToAttr(err))
+		return nil, fmt.Errorf("data encoding failed: %w", err)
 	}
 
-	client := &http.Client{
-		Timeout: 10 * time.Second,
-	}
-
+	client := &http.Client{Timeout: 10 * time.Second}
 	resp, err := client.Post(url, "application/json", bytes.NewReader(requestBody))
 	if err != nil {
 		log.Error("HTTP request failed", logger.ErrToAttr(err))
-		return nil, fmt.Errorf("failed to send request: %w", err)
+		return nil, fmt.Errorf("service unavailable: %w", err)
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		log.Error("Unexpected HTTP status",
+	if resp.StatusCode >= 400 {
+		body, _ := io.ReadAll(resp.Body)
+		log.Error("Service error response",
 			slog.Int("status", resp.StatusCode),
-			slog.String("status_text", resp.Status))
-		return nil, fmt.Errorf("received bad status: %d %s", resp.StatusCode, resp.Status)
+			slog.String("response", string(body)))
+		return nil, fmt.Errorf("service returned %d status: %s", resp.StatusCode, string(body))
 	}
 
 	responseData, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Error("Failed to read response body", logger.ErrToAttr(err))
-		return nil, fmt.Errorf("response reading failed: %w", err)
+		log.Error("Failed to read response", logger.ErrToAttr(err))
+		return nil, fmt.Errorf("response read failed: %w", err)
 	}
 
-	log.Info("Successfully processed user creation",
+	log.Info("User created successfully",
 		slog.Int("response_size", len(responseData)),
-		slog.Int("status_code", resp.StatusCode))
+		slog.Int("status", resp.StatusCode))
 
 	return responseData, nil
 }
