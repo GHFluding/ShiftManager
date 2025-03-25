@@ -20,19 +20,10 @@ type createShiftParams struct {
 func CreateShift(data []byte, log *slog.Logger, url string) ([]byte, error) {
 	log.Info("Start processing shift creation request")
 
-	var shift createShiftParams
-	if err := json.Unmarshal(data, &shift); err != nil {
-		log.Error("JSON unmarshal error", logger.ErrToAttr(err))
-		return nil, fmt.Errorf("invalid request format: %w", err)
+	shift, err := marshalCreateShift(data, log)
+	if err != nil {
+		return nil, err
 	}
-	if shift.Machineid == 0 || shift.ShiftMaster == 0 {
-		return nil, fmt.Errorf("missing required fields")
-	}
-
-	log.Info("Parsed shift data",
-		slog.Int64("machineid", shift.Machineid),
-		slog.Int64("shiftmaster", shift.ShiftMaster))
-
 	requestBody, err := json.Marshal(shift)
 	if err != nil {
 		log.Error("JSON marshal error", logger.ErrToAttr(err))
@@ -66,4 +57,21 @@ func CreateShift(data []byte, log *slog.Logger, url string) ([]byte, error) {
 		slog.Int("status", resp.StatusCode))
 
 	return responseData, nil
+}
+
+func marshalCreateShift(data []byte, log *slog.Logger) (createShiftParams, error) {
+	var shift createShiftParams
+	if err := json.Unmarshal(data, &shift); err != nil {
+		log.Error("JSON unmarshal error", logger.ErrToAttr(err))
+		return shift, fmt.Errorf("invalid request format: %w", err)
+	}
+	if shift.Machineid == 0 || shift.ShiftMaster == 0 {
+		return shift, fmt.Errorf("missing required fields")
+	}
+
+	log.Info("Parsed shift data",
+		slog.Int64("machineid", shift.Machineid),
+		slog.Int64("shiftmaster", shift.ShiftMaster))
+	return shift, nil
+
 }

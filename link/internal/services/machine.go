@@ -21,21 +21,10 @@ type createMachineParams struct {
 func CreateMachine(data []byte, log *slog.Logger, url string) ([]byte, error) {
 	log.Info("Start processing machine creation request")
 
-	var machine createMachineParams
-	if err := json.Unmarshal(data, &machine); err != nil {
-		log.Error("JSON unmarshal error", logger.ErrToAttr(err))
-		return nil, fmt.Errorf("invalid request format: %w", err)
+	machine, err := marshalCreateMachine(data, log)
+	if err != nil {
+		return nil, err
 	}
-
-	if machine.Name == "" {
-		return nil, fmt.Errorf("field 'name' is required")
-	}
-
-	log.Info("Parsed machine data",
-		slog.String("name", machine.Name),
-		slog.Any("isrepairrequired", machine.IsRepairRequired),
-		slog.Any("isactive", machine.IsActive))
-
 	requestBody, err := json.Marshal(machine)
 	if err != nil {
 		log.Error("JSON marshal error", logger.ErrToAttr(err))
@@ -69,4 +58,24 @@ func CreateMachine(data []byte, log *slog.Logger, url string) ([]byte, error) {
 		slog.Int("status", resp.StatusCode))
 
 	return responseData, nil
+}
+
+func marshalCreateMachine(data []byte, log *slog.Logger) (createMachineParams, error) {
+
+	var machine createMachineParams
+	if err := json.Unmarshal(data, &machine); err != nil {
+		log.Error("JSON unmarshal error", logger.ErrToAttr(err))
+		return machine, fmt.Errorf("invalid request format: %w", err)
+	}
+
+	if machine.Name == "" {
+		return machine, fmt.Errorf("field 'name' is required")
+	}
+
+	log.Info("Parsed machine data",
+		slog.String("name", machine.Name),
+		slog.Any("isrepairrequired", machine.IsRepairRequired),
+		slog.Any("isactive", machine.IsActive))
+	return machine, nil
+
 }

@@ -24,24 +24,10 @@ type createTaskParams struct {
 func CreateTask(data []byte, log *slog.Logger, url string) ([]byte, error) {
 	log.Info("Start processing task creation request")
 
-	var task createTaskParams
-	if err := json.Unmarshal(data, &task); err != nil {
-		log.Error("JSON unmarshal error", logger.ErrToAttr(err))
-		return nil, fmt.Errorf("invalid request format: %w", err)
+	task, err := marshalCreateTask(data, log)
+	if err != nil {
+		return nil, err
 	}
-
-	if task.Machineid == 0 || task.Shiftid == 0 || task.Createdby == 0 {
-		return nil, fmt.Errorf("missing required fields")
-	}
-
-	log.Info("Parsed task data",
-		slog.Int64("machineid", task.Machineid),
-		slog.Int64("shiftid", task.Shiftid),
-		slog.String("frequency", task.Frequency),
-		slog.String("taskpriority", task.Taskpriority),
-		slog.String("description", task.Description),
-		slog.Int64("createdby", task.Createdby))
-
 	requestBody, err := json.Marshal(task)
 	if err != nil {
 		log.Error("JSON marshal error", logger.ErrToAttr(err))
@@ -75,4 +61,26 @@ func CreateTask(data []byte, log *slog.Logger, url string) ([]byte, error) {
 		slog.Int("status", resp.StatusCode))
 
 	return responseData, nil
+}
+
+func marshalCreateTask(data []byte, log *slog.Logger) (createTaskParams, error) {
+	var task createTaskParams
+	if err := json.Unmarshal(data, &task); err != nil {
+		log.Error("JSON unmarshal error", logger.ErrToAttr(err))
+		return task, fmt.Errorf("invalid request format: %w", err)
+	}
+
+	if task.Machineid == 0 || task.Shiftid == 0 || task.Createdby == 0 {
+		return task, fmt.Errorf("missing required fields")
+	}
+
+	log.Info("Parsed task data",
+		slog.Int64("machineid", task.Machineid),
+		slog.Int64("shiftid", task.Shiftid),
+		slog.String("frequency", task.Frequency),
+		slog.String("taskpriority", task.Taskpriority),
+		slog.String("description", task.Description),
+		slog.Int64("createdby", task.Createdby))
+
+	return task, nil
 }

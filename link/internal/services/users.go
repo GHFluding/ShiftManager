@@ -21,23 +21,10 @@ type createUserParams struct {
 
 func CreateUser(data []byte, log *slog.Logger, url string) ([]byte, error) {
 	log.Info("Start processing user creation request")
-
-	var user createUserParams
-	if err := json.Unmarshal(data, &user); err != nil {
-		log.Error("JSON unmarshal error", logger.ErrToAttr(err))
-		return nil, fmt.Errorf("invalid request format: %w", err)
+	user, err := marshalCreateUser(data, log)
+	if err != nil {
+		return nil, err
 	}
-
-	if user.Name == "" || user.Role == "" || user.TelegramID == "" {
-		return nil, fmt.Errorf("missing required fields: name, role or telegramid")
-	}
-
-	log.Info("Parsed user data",
-		slog.String("name", user.Name),
-		slog.String("role", user.Role),
-		slog.String("telegramid", user.TelegramID),
-		slog.Any("bitrixid", user.Bitrixid))
-
 	requestBody, err := json.Marshal(user)
 	if err != nil {
 		log.Error("JSON marshal error", logger.ErrToAttr(err))
@@ -71,4 +58,23 @@ func CreateUser(data []byte, log *slog.Logger, url string) ([]byte, error) {
 		slog.Int("status", resp.StatusCode))
 
 	return responseData, nil
+}
+
+func marshalCreateUser(data []byte, log *slog.Logger) (createUserParams, error) {
+	var user createUserParams
+	if err := json.Unmarshal(data, &user); err != nil {
+		log.Error("JSON unmarshal error", logger.ErrToAttr(err))
+		return user, fmt.Errorf("invalid request format: %w", err)
+	}
+
+	if user.Name == "" || user.Role == "" || user.TelegramID == "" {
+		return user, fmt.Errorf("missing required fields: name, role or telegramid")
+	}
+
+	log.Info("Parsed user data",
+		slog.String("name", user.Name),
+		slog.String("role", user.Role),
+		slog.String("telegramid", user.TelegramID),
+		slog.Any("bitrixid", user.Bitrixid))
+	return user, nil
 }
