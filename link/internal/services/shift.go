@@ -65,9 +65,6 @@ func marshalCreateShift(data []byte, log *slog.Logger) (createShiftParams, error
 		log.Error("JSON unmarshal error", logger.ErrToAttr(err))
 		return shift, fmt.Errorf("invalid request format: %w", err)
 	}
-	if shift.Machineid == 0 || shift.ShiftMaster == 0 {
-		return shift, fmt.Errorf("missing required fields")
-	}
 
 	log.Info("Parsed shift data",
 		slog.Int64("machineid", shift.Machineid),

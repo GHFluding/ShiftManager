@@ -67,10 +67,6 @@ func marshalCreateUser(data []byte, log *slog.Logger) (createUserParams, error) 
 		return user, fmt.Errorf("invalid request format: %w", err)
 	}
 
-	if user.Name == "" || user.Role == "" || user.TelegramID == "" {
-		return user, fmt.Errorf("missing required fields: name, role or telegramid")
-	}
-
 	log.Info("Parsed user data",
 		slog.String("name", user.Name),
 		slog.String("role", user.Role),

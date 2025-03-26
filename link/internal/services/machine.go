@@ -68,10 +68,6 @@ func marshalCreateMachine(data []byte, log *slog.Logger) (createMachineParams, e
 		return machine, fmt.Errorf("invalid request format: %w", err)
 	}
 
-	if machine.Name == "" {
-		return machine, fmt.Errorf("field 'name' is required")
-	}
-
 	log.Info("Parsed machine data",
 		slog.String("name", machine.Name),
 		slog.Any("isrepairrequired", machine.IsRepairRequired),

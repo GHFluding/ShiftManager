@@ -70,10 +70,6 @@ func marshalCreateTask(data []byte, log *slog.Logger) (createTaskParams, error) 
 		return task, fmt.Errorf("invalid request format: %w", err)
 	}
 
-	if task.Machineid == 0 || task.Shiftid == 0 || task.Createdby == 0 {
-		return task, fmt.Errorf("missing required fields")
-	}
-
 	log.Info("Parsed task data",
 		slog.Int64("machineid", task.Machineid),
 		slog.Int64("shiftid", task.Shiftid),
