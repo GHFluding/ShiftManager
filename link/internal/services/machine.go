@@ -30,7 +30,12 @@ func CreateMachine(data []byte, log *slog.Logger, url string) ([]byte, error) {
 		log.Error("JSON marshal error", logger.ErrToAttr(err))
 		return nil, fmt.Errorf("data encoding failed: %w", err)
 	}
-
+	if machine.IsActive == nil {
+		log.Info("Isactive is not set. Using default value")
+	}
+	if machine.IsRepairRequired == nil {
+		log.Info("IsRepairRequired is not set. Using default value")
+	}
 	client := &http.Client{Timeout: 10 * time.Second}
 	resp, err := client.Post(url, "application/json", bytes.NewReader(requestBody))
 	if err != nil {
