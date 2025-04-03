@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package machine;
+
+option go_package = "entities/machine;machine";
+
+message CreateMachine {
+  string name = 1;
+  optional bool is_repair_required = 2;
+  optional bool is_active = 3;
+}
+
+message MachineResponse {
+  CreateMachine data = 1;
+}
+
+service MachineService {
+  rpc Create(CreateMachine) returns (MachineResponse);
+}
