@@ -14,6 +14,7 @@ A Go-based microservices system for managing shifts, tasks, and Bitrix24 chatbot
 └── contract
     ├──contract/protos - protobuf documentation
     └── gen/go - Generated gRPC code
+```
 
 ## Services
 
@@ -42,4 +43,3 @@ A Go-based microservices system for managing shifts, tasks, and Bitrix24 chatbot
   ```bash
   go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
   go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-```
