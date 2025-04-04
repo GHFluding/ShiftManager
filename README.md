@@ -6,6 +6,7 @@ A Go-based microservices system for managing shifts, tasks, and Bitrix24 chatbot
 
 ## Project Structure
 
+```text
 ├── SM - Core service with database
 ├── link - Linking service
 ├── bitrixSM - Bitrix24 chatbot integration
