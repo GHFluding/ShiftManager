@@ -7,6 +7,7 @@ A Go-based microservices system for managing shifts, tasks, and Bitrix24 chatbot
 ## Project Structure
 
 ```text
+.
 ├── SM - Core service with database
 ├── link - Linking service
 ├── bitrixSM - Bitrix24 chatbot integration
@@ -41,3 +42,4 @@ A Go-based microservices system for managing shifts, tasks, and Bitrix24 chatbot
   ```bash
   go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
   go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+```
