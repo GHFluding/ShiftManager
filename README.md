@@ -43,3 +43,7 @@ A Go-based microservices system for managing shifts, tasks, and Bitrix24 chatbot
   ```bash
   go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
   go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+
+## Env file
+
+See the .env.example file in the main directory and in each of the services. In services, the directory services/config/env

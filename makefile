@@ -1,12 +1,12 @@
 # Makefile
 
-.PHONY: generate build docker-build docker-up 
+.PHONY: generate build docker-build docker-up dev
 
+BIN_DIR=bin
 PROTO_DIR=contract\contract\protos\entities
 GEN_DIR=contract\gen\go
 
 generate:
-	mkdir -p $(GEN_DIR)
 	protoc \
 		--proto_path=$(PROTO_DIR) \
 		--go_out=$(GEN_DIR) \
@@ -17,9 +17,10 @@ generate:
 		$(PROTO_DIR)/user/user.proto
 
 build:
-	cd SM && go build -o ../bin/SM ./cmd/sm
-	cd link && go build -o ../bin/link ./cmd
-	cd bitrixSM && go build -o ../bin/bitrixSM ./cmd
+	@mkdir -p $(BIN_DIR)
+	go build -o $(BIN_DIR)/SM  SM/cmd/sm
+	go build -o $(BIN_DIR)/link link/cmd
+	go build -o $(BIN_DIR)/bitrixSM bitrixSM/cmd
 
 docker-build:
 	docker build -t sm-core -f SM/build/Dockerfile .
@@ -27,4 +28,7 @@ docker-build:
 	docker build -t bitrix-bot -f bitrixSM/Dockerfile .
 
 docker-up:
-	docker-compose -f SM/deployments/docker-compose/docker-compose.yaml up -d
+	docker-compose up -d
+
+start:
+	docker-compose up --build
