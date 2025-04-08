@@ -1,7 +1,7 @@
 # README.md
 
-# BiTRIX SM chat bot
-This service works with bitrix24 api
+# Link SM service
+This service is used for communication between others services
 
 # .ENV file
 This service requires an env file to work, an example is located in config/env/.env.example
