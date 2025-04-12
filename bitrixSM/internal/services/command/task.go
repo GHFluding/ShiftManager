@@ -2,7 +2,7 @@ package bot_command
 
 import (
 	config "bsm/internal/config/loadconfig"
-	"bsm/internal/utils/logger"
+	logger "bsm/internal/utils"
 	"log/slog"
 )
 

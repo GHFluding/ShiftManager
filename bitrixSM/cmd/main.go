@@ -4,7 +4,7 @@ import (
 	config "bsm/internal/config/loadconfig"
 
 	apilogic "bsm/internal/services/apiLogic"
-	"bsm/internal/utils/logger"
+	logger "bsm/internal/utils"
 	"log"
 
 	"github.com/gin-gonic/gin"
