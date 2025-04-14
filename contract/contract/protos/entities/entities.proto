@@ -8,57 +8,57 @@ message CreateMachine {
     string name = 1;
     optional bool is_repair_required = 2;
     optional bool is_active = 3;
-    }
+ }
     
-    message MachineResponse {
+message MachineResponse {
     CreateMachine data = 1;
-    }
+}
     
-    message CreateShiftParams {
+message CreateShiftParams {
     int64 machine_id = 1;
     int64 shift_master = 2;
-    }
+ }
     
-    message ShiftResponse {
+message ShiftResponse {
     CreateShiftParams data = 1;
-    }
+}
     
-    message CreateTaskParams {
+message CreateTaskParams {
     int64 machine_id = 1;
     int64 shift_id = 2;
     string frequency = 3;
     string task_priority = 4;
     string description = 5;
     int64 created_by = 6;
-    }
+}
     
-    message TaskResponse {
+message TaskResponse {
     CreateTaskParams data = 1;
-    }
+}
     
-    message CreateUserParams {
+message CreateUserParams {
     optional int64 bitrix_id = 1;
     string telegram_id = 2;
     string name = 3;
     string role = 4;
-    }
+}
     
-    message UserResponse {
+message UserResponse {
     CreateUserParams data = 1;
-    }
+}
     
-    service MachineService {
+service MachineService {
     rpc Create(CreateMachine) returns (MachineResponse);
-    }
+}
     
-    service ShiftService {
+service ShiftService {
     rpc Create(CreateShiftParams) returns (ShiftResponse);
-    }
+}
     
-    service TaskService {
+service TaskService {
     rpc Create(CreateTaskParams) returns (TaskResponse);
-    }
+ }
     
-    service UserService {
+service UserService {
     rpc Create(CreateUserParams) returns (UserResponse);
-    }
+}

@@ -2,9 +2,10 @@ package main
 
 import (
 	config "bsm/internal/config/loadconfig"
+	logger "bsm/internal/utils"
 
 	apilogic "bsm/internal/services/apiLogic"
-	            
+
 	"log"
 
 	"github.com/gin-gonic/gin"
