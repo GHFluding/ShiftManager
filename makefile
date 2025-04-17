@@ -3,18 +3,15 @@
 .PHONY: generate build docker-build docker-up dev
 
 BIN_DIR=bin
-PROTO_DIR=contract\contract\protos\entities
-GEN_DIR=contract\gen\go
+PROTO_DIR=contract/contract/protos/entities
+GEN_DIR=contract/gen/go
 
 generate:
 	protoc \
-		--proto_path=$(PROTO_DIR) \
-		--go_out=$(GEN_DIR) \
-		--go-grpc_out=$(GEN_DIR) \
-		$(PROTO_DIR)/machine/machine.proto \
-		$(PROTO_DIR)/shift/shift.proto \
-		$(PROTO_DIR)/task/task.proto \
-		$(PROTO_DIR)/user/user.proto
+	--proto_path=$(PROTO_DIR) \
+	--go_out=$(GEN_DIR) \
+	--go-grpc_out=$(GEN_DIR) \
+	$(PROTO_DIR)/entities.proto
 
 build:
 	@mkdir -p $(BIN_DIR)
@@ -30,5 +27,5 @@ docker-build:
 docker-up:
 	docker-compose up -d
 
-start:
+dev:
 	docker-compose up --build
