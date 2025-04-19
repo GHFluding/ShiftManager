@@ -21,33 +21,33 @@ type App struct {
 type CommandCode int
 
 const (
-	machineServer CommandCode = iota
-	userServer
-	taskServer
-	shiftServer
+	MachineServer CommandCode = iota
+	UserServer
+	TaskServer
+	ShiftServer
 )
 
 var commandName = map[CommandCode]string{
-	machineServer: "machine",
-	userServer:    "user",
-	taskServer:    "task",
-	shiftServer:   "shift",
+	MachineServer: "machine",
+	UserServer:    "user",
+	TaskServer:    "task",
+	ShiftServer:   "shift",
 }
 
 func (cs CommandCode) String() string {
 	return commandName[cs]
 }
 
-func New(command string, log *slog.Logger, port int) *App {
+func New(command CommandCode, log *slog.Logger, port int) *App {
 	gRPCServer := grpc.NewServer()
 	switch command {
-	case machineServer.String():
+	case MachineServer:
 		machine.RegisterServerAPI(gRPCServer)
-	case shiftServer.String():
+	case ShiftServer:
 		shift.RegisterServerAPI(gRPCServer)
-	case userServer.String():
+	case UserServer:
 		user.RegisterServerAPI(gRPCServer)
-	case taskServer.String():
+	case TaskServer:
 		task.RegisterServerAPI(gRPCServer)
 	}
 
@@ -55,6 +55,12 @@ func New(command string, log *slog.Logger, port int) *App {
 		log,
 		gRPCServer,
 		port,
+	}
+}
+
+func (a *App) MustRun() {
+	if err := a.Run(); err != nil {
+		panic(err)
 	}
 }
 
