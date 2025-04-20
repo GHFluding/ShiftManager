@@ -19,4 +19,10 @@ func main() {
 
 	machineApplication := app.New(log, cfg.GRPC.Port, grpcapp.MachineServer)
 	machineApplication.GRPCServer.MustRun()
+	taskApplication := app.New(log, cfg.GRPC.Port, grpcapp.TaskServer)
+	taskApplication.GRPCServer.MustRun()
+	userApplication := app.New(log, cfg.GRPC.Port, grpcapp.UserServer)
+	userApplication.GRPCServer.MustRun()
+	shiftApplication := app.New(log, cfg.GRPC.Port, grpcapp.ShiftServer)
+	shiftApplication.GRPCServer.MustRun()
 }
