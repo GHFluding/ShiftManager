@@ -8,6 +8,7 @@ import (
 	grpcapp "smgrpc/internal/app/grpc"
 	"smgrpc/internal/config"
 	sl "smgrpc/internal/utils/logger"
+	"strconv"
 	"syscall"
 )
 
@@ -19,26 +20,21 @@ func main() {
 	log.Debug("starting application",
 		slog.String("Env", cfg.Env),
 	)
+	modeInt, err := strconv.Atoi(cfg.Server.Mode)
+	if err != nil {
+		panic(err)
+	}
+	mode := grpcapp.CommandCode(modeInt)
+	application := app.New(log, cfg.GRPC.Port, mode)
 
-	machineApplication := app.New(log, cfg.GRPC.Port, grpcapp.MachineServer)
-	taskApplication := app.New(log, cfg.GRPC.Port+1, grpcapp.TaskServer)
-	userApplication := app.New(log, cfg.GRPC.Port+2, grpcapp.UserServer)
-	shiftApplication := app.New(log, cfg.GRPC.Port+3, grpcapp.ShiftServer)
-
-	go machineApplication.GRPCServer.MustRun()
-	go shiftApplication.GRPCServer.MustRun()
-	go userApplication.GRPCServer.MustRun()
-	go taskApplication.GRPCServer.MustRun()
+	go application.GRPCServer.MustRun()
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)
 
 	<-stop
 
-	machineApplication.GRPCServer.Stop()
-	taskApplication.GRPCServer.Stop()
-	userApplication.GRPCServer.Stop()
-	shiftApplication.GRPCServer.Stop()
+	application.GRPCServer.Stop()
 
 	log.Info("Gracefully stopped")
 }

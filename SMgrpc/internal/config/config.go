@@ -11,7 +11,12 @@ import (
 type Config struct {
 	Env            string     `yaml:"env"`
 	GRPC           GRPCConfig `yaml:"grpc"`
+	Server         Server
 	MigrationsPath string
+}
+
+type Server struct {
+	Mode string
 }
 
 type GRPCConfig struct {
@@ -35,12 +40,21 @@ func MustLoadPath(configPath string) *Config {
 	}
 
 	var cfg Config
-
+	cfg.Server.Mode = fetchServerMode()
 	if err := cleanenv.ReadConfig(configPath, &cfg); err != nil {
 		panic("cannot read config: " + err.Error())
 	}
 
 	return &cfg
+}
+
+func fetchServerMode() string {
+	var res string
+
+	flag.StringVar(&res, "mode", "", "server mode type: machine, shift, user, task")
+	flag.Parse()
+
+	return res
 }
 
 // fetchConfigPath fetches config path from command line flag or environment variable.
