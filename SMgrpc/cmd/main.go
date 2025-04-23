@@ -20,7 +20,7 @@ func main() {
 	log.Debug("starting application",
 		slog.String("Env", cfg.Env),
 	)
-	modeInt, err := strconv.Atoi(cfg.Server.Mode)
+	modeInt, err := strconv.Atoi(cfg.EnvMode)
 	if err != nil {
 		panic(err)
 	}
