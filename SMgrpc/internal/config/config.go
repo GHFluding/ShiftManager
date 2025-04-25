@@ -43,15 +43,6 @@ func MustLoadPath(configPath string) *Config {
 	return &cfg
 }
 
-func fetchServerMode() string {
-	var res string
-
-	flag.StringVar(&res, "mode", "", "server mode type: machine, shift, user, task")
-	flag.Parse()
-
-	return res
-}
-
 // fetchConfigPath fetches config path from command line flag or environment variable.
 // Priority: flag > env > default.
 // Default value is empty string.

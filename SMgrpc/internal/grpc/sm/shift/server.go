@@ -15,5 +15,7 @@ func RegisterServerAPI(gRPC *grpc.Server) {
 	entities.RegisterShiftServiceServer(gRPC, &serverAPI{})
 }
 func (s *serverAPI) Create(ctx context.Context, req *entities.CreateShiftParams) (*entities.ShiftResponse, error) {
-	panic("implement me")
+
+	var resp entities.ShiftResponse
+	return &resp, nil
 }
