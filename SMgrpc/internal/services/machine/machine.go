@@ -25,7 +25,7 @@ type MachineSaver interface {
 	)
 }
 type MachineProvider interface {
-	Machine(ctx context.Context, name string) (models.Machine, error)
+	Machine(ctx context.Context, id int64) (models.Machine, error)
 	// TODO: IsRepairRequired and isActive
 }
 
@@ -51,9 +51,15 @@ func (m *MachineApp) Create(ctx context.Context,
 	id, err := m.saver.SaveMachine(ctx, name, isRepairRequired, isActive)
 	if err != nil {
 		log.Error("failed to create machine", sl.Err(err))
-		return "", nil, nil, err
+		return name, isRepairRequired, isActive, err
 	}
 	log.Info("machine is created", slog.Int64("id", id))
-	//TODO: check machine in db with id and return db's value
-	return name, isRepairRequired, isActive, nil
+
+	machine, err := m.provider.Machine(ctx, id)
+	if err != nil {
+		log.Error("failed to check machine", sl.Err(err))
+		return name, isRepairRequired, isActive, err
+	}
+
+	return machine.Name, machine.IsRepairRequired, machine.IsActive, nil
 }

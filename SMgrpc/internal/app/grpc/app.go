@@ -39,6 +39,7 @@ func (cs CommandCode) String() string {
 }
 
 func New(command CommandCode, log *slog.Logger, port int) *App {
+	//TODO: make interface, for connecting db
 	gRPCServer := grpc.NewServer()
 	switch command {
 	case MachineServer:
