@@ -25,7 +25,9 @@ func main() {
 		panic(err)
 	}
 	mode := grpcapp.CommandCode(modeInt)
-	application := app.New(log, cfg.GRPC.Port, db_app, mode)
+
+	//TODO: Run without DB
+	application := app.New(log, cfg.GRPC.Port, mode)
 
 	go application.GRPCServer.MustRun()
 
