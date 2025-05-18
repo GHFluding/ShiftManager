@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"smgrpc/internal/domain/models"
+	task_grpc "smgrpc/internal/grpc/sm/task"
 	sl "smgrpc/internal/utils/logger"
 )
 
@@ -27,8 +28,7 @@ type TaskSaver interface {
 	)
 }
 type TaskProvider interface {
-	//maybe id, not machine id and shift id
-	Task(ctx context.Context, machineId int64, shiftId int64) (models.Task, error)
+	Task(ctx context.Context, id int64) (models.Task, error)
 }
 
 func New(log *slog.Logger, taskSaver TaskSaver, taskProvider TaskProvider) *TaskApp {
@@ -46,11 +46,7 @@ func (t *TaskApp) Create(ctx context.Context,
 	taskPriority string,
 	description string,
 ) (
-	int64,
-	int64,
-	string,
-	string,
-	string,
+	task_grpc.TaskResponse,
 	error,
 ) {
 	const op = "task.Create"
@@ -62,15 +58,21 @@ func (t *TaskApp) Create(ctx context.Context,
 	id, err := t.saver.SaveTask(ctx, machineId, shiftId, frequency, taskPriority, description)
 	if err != nil {
 		log.Error("failed to create task", sl.Err(err))
-		return machineId, shiftId, frequency, taskPriority, description, err
+		return task_grpc.TaskResponse{}, err
 	}
 	log.Info("task is created", slog.Int64("id", id))
 
-	task, err := t.provider.Task(ctx, machineId, shiftId)
+	task, err := t.provider.Task(ctx, id)
 	if err != nil {
 		log.Error("failed to check task", sl.Err(err))
-		return machineId, shiftId, frequency, taskPriority, description, err
+		return task_grpc.TaskResponse{}, err
 	}
-
-	return task.MachineId, task.ShiftId, task.Frequency, task.TaskPriority, task.Description, nil
+	taskResponse := task_grpc.TaskResponse{
+		MachineId:    task.MachineId,
+		ShiftId:      task.ShiftId,
+		Frequency:    task.Frequency,
+		TaskPriority: task.TaskPriority,
+		Description:  task.Description,
+	}
+	return taskResponse, nil
 }

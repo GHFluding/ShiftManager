@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"smgrpc/internal/domain/models"
+	user_grpc "smgrpc/internal/grpc/sm/user"
 	sl "smgrpc/internal/utils/logger"
 )
 
@@ -43,10 +44,7 @@ func (s *UserApp) Create(ctx context.Context,
 	name string,
 	role string,
 ) (
-	*int64,
-	string,
-	string,
-	string,
+	user_grpc.UserResponse,
 	error,
 ) {
 	const op = "user.Create"
@@ -59,15 +57,20 @@ func (s *UserApp) Create(ctx context.Context,
 	id, err := s.saver.SaveUser(ctx, bitrixId, telegramId, name, role)
 	if err != nil {
 		log.Error("failed to create user", sl.Err(err))
-		return bitrixId, telegramId, name, role, err
+		return user_grpc.UserResponse{}, err
 	}
 	log.Info("user is created", slog.Int64("id", id))
 
 	user, err := s.provider.User(ctx, id)
 	if err != nil {
 		log.Error("failed to check user", sl.Err(err))
-		return bitrixId, telegramId, name, role, err
+		return user_grpc.UserResponse{}, err
 	}
-
-	return user.BitrixId, user.TelegramId, user.Name, user.Role, nil
+	userResponse := user_grpc.UserResponse{
+		BitrixId:   user.BitrixId,
+		TelegramId: user.TelegramId,
+		Name:       user.Name,
+		Role:       user.Role,
+	}
+	return userResponse, nil
 }

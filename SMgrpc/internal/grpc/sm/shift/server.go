@@ -9,13 +9,16 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+type ShiftResponse struct {
+	MachineId   int64
+	ShiftMaster int64
+}
 type ShiftInterface interface {
 	Create(ctx context.Context,
 		machineId int64,
 		shiftMaster int64,
 	) (
-		int64,
-		int64,
+		ShiftResponse,
 		error,
 	)
 }
@@ -30,15 +33,15 @@ func RegisterServerAPI(gRPC *grpc.Server, shift ShiftInterface) {
 }
 func (s *serverAPI) Create(ctx context.Context, req *entities.CreateShiftParams) (*entities.ShiftResponse, error) {
 
-	machine, master, err := s.shift.Create(ctx, req.MachineId, req.ShiftMaster)
+	shift, err := s.shift.Create(ctx, req.MachineId, req.ShiftMaster)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "internal error")
 	}
 
 	return &entities.ShiftResponse{
 		Data: &entities.CreateShiftParams{
-			MachineId:   machine,
-			ShiftMaster: master,
+			MachineId:   shift.MachineId,
+			ShiftMaster: shift.ShiftMaster,
 		},
 	}, nil
 }

@@ -9,6 +9,13 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+type TaskResponse struct {
+	MachineId    int64
+	ShiftId      int64
+	Frequency    string
+	TaskPriority string
+	Description  string
+}
 type TaskInterface interface {
 	Create(ctx context.Context,
 		machineId int64,
@@ -17,11 +24,7 @@ type TaskInterface interface {
 		taskPriority string,
 		description string,
 	) (
-		int64,
-		int64,
-		string,
-		string,
-		string,
+		TaskResponse,
 		error,
 	)
 }
@@ -43,18 +46,18 @@ func (s *serverAPI) Create(ctx context.Context, req *entities.CreateTaskParams) 
 	if req.GetTaskPriority() == "" {
 		return nil, status.Error(codes.InvalidArgument, "name is empty")
 	}
-	machineId, shiftId, frequency, taskPriority, description, err := s.task.Create(ctx, req.MachineId, req.ShiftId, req.Frequency, req.TaskPriority, req.Description)
+	task, err := s.task.Create(ctx, req.MachineId, req.ShiftId, req.Frequency, req.TaskPriority, req.Description)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "internal error")
 	}
 
 	return &entities.TaskResponse{
 		Data: &entities.CreateTaskParams{
-			MachineId:    machineId,
-			ShiftId:      shiftId,
-			Frequency:    frequency,
-			TaskPriority: taskPriority,
-			Description:  description,
+			MachineId:    task.MachineId,
+			ShiftId:      task.ShiftId,
+			Frequency:    task.Frequency,
+			TaskPriority: task.TaskPriority,
+			Description:  task.Description,
 		},
 	}, nil
 }

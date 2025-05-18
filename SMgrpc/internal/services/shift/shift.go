@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"smgrpc/internal/domain/models"
+	shift_grpc "smgrpc/internal/grpc/sm/shift"
 	sl "smgrpc/internal/utils/logger"
 )
 
@@ -39,8 +40,7 @@ func (s *ShiftApp) Create(ctx context.Context,
 	machineId int64,
 	masterId int64,
 ) (
-	int64,
-	int64,
+	shift_grpc.ShiftResponse,
 	error,
 ) {
 	const op = "shift.Create"
@@ -53,15 +53,18 @@ func (s *ShiftApp) Create(ctx context.Context,
 	id, err := s.saver.SaveShift(ctx, machineId, masterId)
 	if err != nil {
 		log.Error("failed to create shift", sl.Err(err))
-		return machineId, masterId, err
+		return shift_grpc.ShiftResponse{}, err
 	}
 	log.Info("shift is created", slog.Int64("id", id))
 
 	shift, err := s.provider.Shift(ctx, id)
 	if err != nil {
 		log.Error("failed to check shift", sl.Err(err))
-		return machineId, masterId, err
+		return shift_grpc.ShiftResponse{}, err
 	}
-
-	return shift.MachineId, shift.MasterId, nil
+	shiftResponse := shift_grpc.ShiftResponse{
+		MachineId:   shift.MachineId,
+		ShiftMaster: shift.ShiftMaster,
+	}
+	return shiftResponse, nil
 }

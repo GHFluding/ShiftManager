@@ -9,6 +9,12 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+type UserResponse struct {
+	BitrixId   *int64
+	TelegramId string
+	Name       string
+	Role       string
+}
 type UserInterface interface {
 	Create(ctx context.Context,
 		BitrixId *int64,
@@ -16,10 +22,7 @@ type UserInterface interface {
 		Name string,
 		Role string,
 	) (
-		*int64,
-		string,
-		string,
-		string,
+		UserResponse,
 		error,
 	)
 }
@@ -38,17 +41,17 @@ func (s *serverAPI) Create(ctx context.Context, req *entities.CreateUserParams) 
 	if req.GetRole() == "" {
 		return nil, status.Error(codes.InvalidArgument, "name is empty")
 	}
-	bitrixId, telegramId, name, role, err := s.user.Create(ctx, req.BitrixId, req.TelegramId, req.Name, req.Role)
+	user, err := s.user.Create(ctx, req.BitrixId, req.TelegramId, req.Name, req.Role)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "internal error")
 	}
 
 	return &entities.UserResponse{
 		Data: &entities.CreateUserParams{
-			BitrixId:   bitrixId,
-			TelegramId: telegramId,
-			Name:       name,
-			Role:       role,
+			BitrixId:   user.BitrixId,
+			TelegramId: user.TelegramId,
+			Name:       user.Name,
+			Role:       user.Role,
 		},
 	}, nil
 }

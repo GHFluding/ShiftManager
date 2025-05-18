@@ -9,15 +9,19 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+type MachineResponse struct {
+	Name             string
+	IsRepairRequired *bool
+	IsActive         *bool
+}
+
 type MachineInterface interface {
 	Create(ctx context.Context,
 		name string,
 		isRepairRequired *bool,
 		isActive *bool,
 	) (
-		string,
-		*bool,
-		*bool,
+		MachineResponse,
 		error,
 	)
 }
@@ -33,16 +37,16 @@ func (s *serverAPI) Create(ctx context.Context, req *entities.CreateMachine) (*e
 	if req.GetName() == "" {
 		return nil, status.Error(codes.InvalidArgument, "name is empty")
 	}
-	respName, repair, active, err := s.machine.Create(ctx, req.Name, req.IsRepairRequired, req.IsActive)
+	machine, err := s.machine.Create(ctx, req.Name, req.IsRepairRequired, req.IsActive)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "internal error")
 	}
 
 	return &entities.MachineResponse{
 		Data: &entities.CreateMachine{
-			Name:             respName,
-			IsRepairRequired: repair,
-			IsActive:         active,
+			Name:             machine.Name,
+			IsRepairRequired: machine.IsRepairRequired,
+			IsActive:         machine.IsActive,
 		},
 	}, nil
 }

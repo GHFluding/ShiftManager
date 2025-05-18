@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"smgrpc/internal/domain/models"
+	machine_grpc "smgrpc/internal/grpc/sm/machine"
 	sl "smgrpc/internal/utils/logger"
 )
 
@@ -41,7 +42,7 @@ func (m *MachineApp) Create(ctx context.Context,
 	name string,
 	isRepairRequired *bool,
 	isActive *bool,
-) (string, *bool, *bool, error) {
+) (machine_grpc.MachineResponse, error) {
 	const op = "machine.Create"
 	log := m.log.With(
 		slog.String("op", op),
@@ -51,15 +52,19 @@ func (m *MachineApp) Create(ctx context.Context,
 	id, err := m.saver.SaveMachine(ctx, name, isRepairRequired, isActive)
 	if err != nil {
 		log.Error("failed to create machine", sl.Err(err))
-		return name, isRepairRequired, isActive, err
+		return machine_grpc.MachineResponse{}, err
 	}
 	log.Info("machine is created", slog.Int64("id", id))
 
 	machine, err := m.provider.Machine(ctx, id)
 	if err != nil {
 		log.Error("failed to check machine", sl.Err(err))
-		return name, isRepairRequired, isActive, err
+		return machine_grpc.MachineResponse{}, err
 	}
-
-	return machine.Name, machine.IsRepairRequired, machine.IsActive, nil
+	machineResponse := machine_grpc.MachineResponse{
+		Name:             machine.Name,
+		IsRepairRequired: machine.IsRepairRequired,
+		IsActive:         machine.IsActive,
+	}
+	return machineResponse, nil
 }

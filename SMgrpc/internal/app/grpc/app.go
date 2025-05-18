@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net"
+	"smgrpc/internal/domain/models"
 	"smgrpc/internal/grpc/sm/machine"
 	"smgrpc/internal/grpc/sm/shift"
 	"smgrpc/internal/grpc/sm/task"
@@ -38,18 +39,17 @@ func (cs CommandCode) String() string {
 	return commandName[cs]
 }
 
-func New(command CommandCode, log *slog.Logger, port int) *App {
-	//TODO: make interface, for connecting db
+func New(command CommandCode, log *slog.Logger, db_app models.DBFunction, port int) *App {
 	gRPCServer := grpc.NewServer()
 	switch command {
 	case MachineServer:
-		machine.RegisterServerAPI(gRPCServer)
+		machine.RegisterServerAPI(gRPCServer, db_app.Machine)
 	case ShiftServer:
-		shift.RegisterServerAPI(gRPCServer)
+		shift.RegisterServerAPI(gRPCServer, db_app.Shift)
 	case UserServer:
-		user.RegisterServerAPI(gRPCServer)
+		user.RegisterServerAPI(gRPCServer, db_app.User)
 	case TaskServer:
-		task.RegisterServerAPI(gRPCServer)
+		task.RegisterServerAPI(gRPCServer, db_app.Task)
 	}
 
 	return &App{
