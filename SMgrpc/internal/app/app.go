@@ -16,6 +16,7 @@ type App struct {
 	GRPCServer *grpcapp.App
 }
 
+// New creates a new variable of type *App
 func New(log *slog.Logger, grpcPort int, db_app models.DBFunction, command grpcapp.CommandCode) *App {
 	grpcApp := grpcapp.New(command, log, db_app, grpcPort)
 

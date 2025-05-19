@@ -10,13 +10,13 @@ import (
 )
 
 type ShiftResponse struct {
-	MachineId   int64
-	ShiftMaster int64
+	MachineId     int64
+	ShiftMasterID int64
 }
 type ShiftInterface interface {
 	Create(ctx context.Context,
 		machineId int64,
-		shiftMaster int64,
+		shiftMasterID int64,
 	) (
 		ShiftResponse,
 		error,
@@ -41,7 +41,7 @@ func (s *serverAPI) Create(ctx context.Context, req *entities.CreateShiftParams)
 	return &entities.ShiftResponse{
 		Data: &entities.CreateShiftParams{
 			MachineId:   shift.MachineId,
-			ShiftMaster: shift.ShiftMaster,
+			ShiftMaster: shift.ShiftMasterID,
 		},
 	}, nil
 }

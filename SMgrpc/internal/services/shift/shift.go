@@ -18,7 +18,7 @@ type ShiftSaver interface {
 	SaveShift(
 		ctx context.Context,
 		machineId int64,
-		masterID int64,
+		shiftMasterID int64,
 	) (
 		id int64,
 		err error,
@@ -38,7 +38,7 @@ func New(log *slog.Logger, shiftSaver ShiftSaver, shiftProvider ShiftProvider) *
 
 func (s *ShiftApp) Create(ctx context.Context,
 	machineId int64,
-	masterId int64,
+	shiftMasterID int64,
 ) (
 	shift_grpc.ShiftResponse,
 	error,
@@ -46,11 +46,11 @@ func (s *ShiftApp) Create(ctx context.Context,
 	const op = "shift.Create"
 	log := s.log.With(
 		slog.String("op", op),
-		slog.Int64("master id", masterId),
+		slog.Int64("master id", shiftMasterID),
 		slog.Int64("machine id", machineId),
 	)
 	log.Info("creating shift")
-	id, err := s.saver.SaveShift(ctx, machineId, masterId)
+	id, err := s.saver.SaveShift(ctx, machineId, shiftMasterID)
 	if err != nil {
 		log.Error("failed to create shift", sl.Err(err))
 		return shift_grpc.ShiftResponse{}, err
@@ -63,8 +63,8 @@ func (s *ShiftApp) Create(ctx context.Context,
 		return shift_grpc.ShiftResponse{}, err
 	}
 	shiftResponse := shift_grpc.ShiftResponse{
-		MachineId:   shift.MachineId,
-		ShiftMaster: shift.ShiftMaster,
+		MachineId:     shift.MachineId,
+		ShiftMasterID: shift.ShiftMasterID,
 	}
 	return shiftResponse, nil
 }

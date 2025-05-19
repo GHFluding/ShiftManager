@@ -7,6 +7,7 @@ import (
 	"smgrpc/internal/app"
 	grpcapp "smgrpc/internal/app/grpc"
 	"smgrpc/internal/config"
+	"smgrpc/internal/domain/models"
 	sl "smgrpc/internal/utils/logger"
 	"strconv"
 	"syscall"
@@ -26,8 +27,8 @@ func main() {
 	}
 	mode := grpcapp.CommandCode(modeInt)
 
-	//TODO: Run without DB
-	application := app.New(log, cfg.GRPC.Port, mode)
+	DB_Mock := models.DBFunction{}
+	application := app.New(log, cfg.GRPC.Port, DB_Mock, mode)
 
 	go application.GRPCServer.MustRun()
 
