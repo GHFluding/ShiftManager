@@ -3,8 +3,9 @@ package logic
 import (
 	"context"
 	"log/slog"
-	"sm/internal/database/postgres"
-	"sm/internal/utils/logger"
+
+	"github.com/GHFluding/ShiftManager/SM/internal/database/postgres"
+	"github.com/GHFluding/ShiftManager/SM/internal/utils/logger"
 )
 
 func AddTaskToShift(log *slog.Logger, db *postgres.Queries, reqTaskId int64, reqShiftID int64) {

@@ -3,9 +3,10 @@ package shift_service
 import (
 	"context"
 	"log/slog"
-	"smgrpc/internal/domain/models"
-	task_grpc "smgrpc/internal/grpc/sm/task"
-	sl "smgrpc/internal/utils/logger"
+
+	"github.com/GHFluding/ShiftManager/SMgrpc/internal/domain/models"
+	task_grpc "github.com/GHFluding/ShiftManager/SMgrpc/internal/grpc/sm/task"
+	sl "github.com/GHFluding/ShiftManager/SMgrpc/internal/utils/logger"
 )
 
 type TaskApp struct {

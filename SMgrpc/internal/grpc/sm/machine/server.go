@@ -2,7 +2,8 @@ package machine
 
 import (
 	"context"
-	entities "smgrpc/internal/gen"
+
+	entities "github.com/GHFluding/ShiftManager/SMgrpc/internal/gen"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"

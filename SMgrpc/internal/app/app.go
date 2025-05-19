@@ -4,12 +4,13 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
-	grpcapp "smgrpc/internal/app/grpc"
-	"smgrpc/internal/config"
-	"smgrpc/internal/domain/models"
-	sl "smgrpc/internal/utils/logger"
 	"strconv"
 	"syscall"
+
+	grpcapp "github.com/GHFluding/ShiftManager/SMgrpc/internal/app/grpc"
+	"github.com/GHFluding/ShiftManager/SMgrpc/internal/config"
+	"github.com/GHFluding/ShiftManager/SMgrpc/internal/domain/models"
+	sl "github.com/GHFluding/ShiftManager/SMgrpc/internal/utils/logger"
 )
 
 type App struct {
@@ -25,7 +26,9 @@ func New(log *slog.Logger, grpcPort int, db_app models.DBFunction, command grpca
 	}
 }
 
-func (a *App) RunExternal(db_app models.DBFunction) {
+// Run method of *App type variable, which starts grpc server,
+// takes as argument a set of functions implementing a number of interfaces for working with data
+func (a *App) Run(db_app models.DBFunction) {
 	cfg := config.MustLoad()
 
 	log := sl.SetupLogger(cfg.Env)

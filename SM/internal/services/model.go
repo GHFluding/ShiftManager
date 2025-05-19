@@ -1,6 +1,6 @@
 package services
 
-import "sm/internal/database/postgres"
+import "github.com/GHFluding/ShiftManager/SM/internal/database/postgres"
 
 type User struct {
 	ID       int64

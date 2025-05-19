@@ -2,9 +2,10 @@ package services
 
 import (
 	"context"
-	"sm/internal/database/postgres"
-	"sm/internal/services/logic"
-	"sm/internal/utils/logger"
+
+	"github.com/GHFluding/ShiftManager/SM/internal/database/postgres"
+	"github.com/GHFluding/ShiftManager/SM/internal/services/logic"
+	"github.com/GHFluding/ShiftManager/SM/internal/utils/logger"
 
 	"github.com/jackc/pgx/v5/pgtype"
 )

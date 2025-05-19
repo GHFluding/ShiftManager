@@ -1,12 +1,13 @@
 package apilogic
 
 import (
-	config "bsm/internal/config/loadconfig"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"log/slog"
 	"net/http"
+
+	config "github.com/GHFluding/ShiftManager/bitrixSM/internal/config/loadconfig"
 
 	"github.com/gin-gonic/gin"
 )

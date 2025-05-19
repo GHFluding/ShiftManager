@@ -3,8 +3,9 @@ package services
 import (
 	"context"
 	"errors"
-	"sm/internal/database/postgres"
-	"sm/internal/utils/logger"
+
+	"github.com/GHFluding/ShiftManager/SM/internal/database/postgres"
+	"github.com/GHFluding/ShiftManager/SM/internal/utils/logger"
 )
 
 func DeleteUser(sp *ServicesParams, userid int64) error {

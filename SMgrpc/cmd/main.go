@@ -4,15 +4,17 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
-	"smgrpc/internal/app"
-	grpcapp "smgrpc/internal/app/grpc"
-	"smgrpc/internal/config"
-	"smgrpc/internal/domain/models"
-	sl "smgrpc/internal/utils/logger"
 	"strconv"
 	"syscall"
+
+	"github.com/GHFluding/ShiftManager/SMgrpc/internal/app"
+	grpcapp "github.com/GHFluding/ShiftManager/SMgrpc/internal/app/grpc"
+	"github.com/GHFluding/ShiftManager/SMgrpc/internal/config"
+	"github.com/GHFluding/ShiftManager/SMgrpc/internal/domain/models"
+	sl "github.com/GHFluding/ShiftManager/SMgrpc/internal/utils/logger"
 )
 
+// main is an unused function in this module
 func main() {
 	cfg := config.MustLoad()
 

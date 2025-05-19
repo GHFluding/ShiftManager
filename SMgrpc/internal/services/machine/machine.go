@@ -3,9 +3,10 @@ package machine_service
 import (
 	"context"
 	"log/slog"
-	"smgrpc/internal/domain/models"
-	machine_grpc "smgrpc/internal/grpc/sm/machine"
-	sl "smgrpc/internal/utils/logger"
+
+	"github.com/GHFluding/ShiftManager/SMgrpc/internal/domain/models"
+	machine_grpc "github.com/GHFluding/ShiftManager/SMgrpc/internal/grpc/sm/machine"
+	sl "github.com/GHFluding/ShiftManager/SMgrpc/internal/utils/logger"
 )
 
 type MachineApp struct {

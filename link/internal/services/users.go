@@ -8,8 +8,9 @@ import (
 	"net/http"
 	"time"
 
-	logger "linkSM/internal/utils"
 	"log/slog"
+
+	logger "github.com/GHFluding/ShiftManager/link/internal/utils"
 )
 
 type createUserParams struct {

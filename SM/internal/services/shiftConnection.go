@@ -2,7 +2,8 @@ package services
 
 import (
 	"context"
-	"sm/internal/utils/logger"
+
+	"github.com/GHFluding/ShiftManager/SM/internal/utils/logger"
 )
 
 func ShiftWorkersList(sp *ServicesParams, shiftid int64) ([]ShiftWorker, error) {

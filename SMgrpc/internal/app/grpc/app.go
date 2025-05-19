@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"log/slog"
 	"net"
-	"smgrpc/internal/domain/models"
-	"smgrpc/internal/grpc/sm/machine"
-	"smgrpc/internal/grpc/sm/shift"
-	"smgrpc/internal/grpc/sm/task"
-	"smgrpc/internal/grpc/sm/user"
+
+	"github.com/GHFluding/ShiftManager/SMgrpc/internal/domain/models"
+	"github.com/GHFluding/ShiftManager/SMgrpc/internal/grpc/sm/machine"
+	"github.com/GHFluding/ShiftManager/SMgrpc/internal/grpc/sm/shift"
+	"github.com/GHFluding/ShiftManager/SMgrpc/internal/grpc/sm/task"
+	"github.com/GHFluding/ShiftManager/SMgrpc/internal/grpc/sm/user"
 
 	"google.golang.org/grpc"
 )

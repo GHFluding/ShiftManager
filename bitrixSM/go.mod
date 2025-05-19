@@ -1,4 +1,4 @@
-module bsm
+module github.com/GHFluding/ShiftManager/bitrixSM
 
 go 1.23.4
 

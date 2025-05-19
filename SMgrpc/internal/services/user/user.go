@@ -3,9 +3,10 @@ package user_service
 import (
 	"context"
 	"log/slog"
-	"smgrpc/internal/domain/models"
-	user_grpc "smgrpc/internal/grpc/sm/user"
-	sl "smgrpc/internal/utils/logger"
+
+	"github.com/GHFluding/ShiftManager/SMgrpc/internal/domain/models"
+	user_grpc "github.com/GHFluding/ShiftManager/SMgrpc/internal/grpc/sm/user"
+	sl "github.com/GHFluding/ShiftManager/SMgrpc/internal/utils/logger"
 )
 
 type UserApp struct {

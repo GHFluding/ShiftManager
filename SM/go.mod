@@ -1,4 +1,4 @@
-module sm
+module github.com/GHFluding/ShiftManager/SM
 
 go 1.23.4
 

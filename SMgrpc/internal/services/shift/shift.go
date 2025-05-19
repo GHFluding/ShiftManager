@@ -3,9 +3,10 @@ package shift_service
 import (
 	"context"
 	"log/slog"
-	"smgrpc/internal/domain/models"
-	shift_grpc "smgrpc/internal/grpc/sm/shift"
-	sl "smgrpc/internal/utils/logger"
+
+	"github.com/GHFluding/ShiftManager/SMgrpc/internal/domain/models"
+	shift_grpc "github.com/GHFluding/ShiftManager/SMgrpc/internal/grpc/sm/shift"
+	sl "github.com/GHFluding/ShiftManager/SMgrpc/internal/utils/logger"
 )
 
 type ShiftApp struct {
