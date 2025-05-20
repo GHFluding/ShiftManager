@@ -10,6 +10,7 @@ import (
 	"github.com/GHFluding/ShiftManager/SMgrpc/internal/grpc/sm/shift"
 	"github.com/GHFluding/ShiftManager/SMgrpc/internal/grpc/sm/task"
 	"github.com/GHFluding/ShiftManager/SMgrpc/internal/grpc/sm/user"
+	machine_service "github.com/GHFluding/ShiftManager/SMgrpc/internal/services/machine"
 
 	"google.golang.org/grpc"
 )
@@ -44,7 +45,8 @@ func New(command CommandCode, log *slog.Logger, db_app models.DBFunction, port i
 	gRPCServer := grpc.NewServer()
 	switch command {
 	case MachineServer:
-		machine.RegisterServerAPI(gRPCServer, db_app.Machine)
+		service := machine_service.New(log, db_app.Machine)
+		machine.RegisterServerAPI(gRPCServer, service)
 	case ShiftServer:
 		shift.RegisterServerAPI(gRPCServer, db_app.Shift)
 	case UserServer:
