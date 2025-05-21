@@ -6,6 +6,7 @@ import (
 
 	"github.com/GHFluding/ShiftManager/SM/internal/database/postgres"
 	"github.com/GHFluding/ShiftManager/SM/internal/utils/logger"
+	"github.com/GHFluding/ShiftManager/SMgrpc/pkg/domain/models"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -14,7 +15,7 @@ type Services struct {
 	log *slog.Logger
 }
 
-func (sp *Services) ParamsSaveMachine(
+func (sp *Services) SaveMachine(
 	ctx context.Context,
 	name string,
 	isRepairRequired *bool,
@@ -31,6 +32,19 @@ func (sp *Services) ParamsSaveMachine(
 	}
 	id = machineDB.ID
 	return id, nil
+}
+
+// Machine release interface Provide for grpc service machine
+func (sp *Services) GetMachine(ctx context.Context, id int64) (models.Machine, error) {
+	machine, err := sp.db.GetMachine(context.Background(), id)
+	if err != nil {
+		return models.Machine{}, err
+	}
+	return models.Machine{
+		Name:             machine.Name,
+		IsRepairRequired: &machine.Isrepairrequired.Bool,
+		IsActive:         &machine.Isactive.Bool,
+	}, nil
 }
 
 func convertMachineParams(name string,

@@ -7,11 +7,11 @@ import (
 	"strconv"
 	"syscall"
 
-	"github.com/GHFluding/ShiftManager/SMgrpc/internal/app"
 	grpcapp "github.com/GHFluding/ShiftManager/SMgrpc/internal/app/grpc"
 	"github.com/GHFluding/ShiftManager/SMgrpc/internal/config"
-	"github.com/GHFluding/ShiftManager/SMgrpc/internal/domain/models"
 	sl "github.com/GHFluding/ShiftManager/SMgrpc/internal/utils/logger"
+	"github.com/GHFluding/ShiftManager/SMgrpc/pkg/app"
+	"github.com/GHFluding/ShiftManager/SMgrpc/pkg/domain/models"
 )
 
 // main is an unused function in this module

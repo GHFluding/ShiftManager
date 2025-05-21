@@ -4,9 +4,9 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/GHFluding/ShiftManager/SMgrpc/internal/domain/models"
 	shift_grpc "github.com/GHFluding/ShiftManager/SMgrpc/internal/grpc/sm/shift"
 	sl "github.com/GHFluding/ShiftManager/SMgrpc/internal/utils/logger"
+	"github.com/GHFluding/ShiftManager/SMgrpc/pkg/domain/models"
 )
 
 type ShiftApp struct {

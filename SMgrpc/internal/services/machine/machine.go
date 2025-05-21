@@ -4,9 +4,9 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/GHFluding/ShiftManager/SMgrpc/internal/domain/models"
 	machine_grpc "github.com/GHFluding/ShiftManager/SMgrpc/internal/grpc/sm/machine"
 	sl "github.com/GHFluding/ShiftManager/SMgrpc/internal/utils/logger"
+	"github.com/GHFluding/ShiftManager/SMgrpc/pkg/domain/models"
 )
 
 type MachineApp struct {
@@ -39,7 +39,7 @@ func (m *MachineApp) Create(ctx context.Context,
 	}
 	log.Info("machine is created", slog.Int64("id", id))
 
-	machine, err := m.DBFunction.Provider.Machine(ctx, id)
+	machine, err := m.DBFunction.Provider.GetMachine(ctx, id)
 	if err != nil {
 		log.Error("failed to check machine", sl.Err(err))
 		return machine_grpc.MachineResponse{}, err

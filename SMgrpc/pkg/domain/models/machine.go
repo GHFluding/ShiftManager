@@ -20,7 +20,7 @@ type MachineSaver interface {
 	)
 }
 type MachineProvider interface {
-	Machine(ctx context.Context, id int64) (Machine, error)
+	GetMachine(ctx context.Context, id int64) (Machine, error)
 	// TODO: IsRepairRequired and isActive
 }
 
