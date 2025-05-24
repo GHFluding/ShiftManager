@@ -2,8 +2,9 @@ package logger
 
 import (
 	"log/slog"
-	"sm/internal/utils/handler_utils"
 	"time"
+
+	"github.com/GHFluding/ShiftManager/SM/internal/utils/handler_utils"
 )
 
 // logger command string: Start, Error, Successfully

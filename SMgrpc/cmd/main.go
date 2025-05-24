@@ -4,14 +4,17 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
-	"smgrpc/internal/app"
-	grpcapp "smgrpc/internal/app/grpc"
-	"smgrpc/internal/config"
-	sl "smgrpc/internal/utils/logger"
 	"strconv"
 	"syscall"
+
+	grpcapp "github.com/GHFluding/ShiftManager/SMgrpc/internal/app/grpc"
+	"github.com/GHFluding/ShiftManager/SMgrpc/internal/config"
+	sl "github.com/GHFluding/ShiftManager/SMgrpc/internal/utils/logger"
+	"github.com/GHFluding/ShiftManager/SMgrpc/pkg/app"
+	"github.com/GHFluding/ShiftManager/SMgrpc/pkg/domain/models"
 )
 
+// main is an unused function in this module
 func main() {
 	cfg := config.MustLoad()
 
@@ -25,7 +28,9 @@ func main() {
 		panic(err)
 	}
 	mode := grpcapp.CommandCode(modeInt)
-	application := app.New(log, cfg.GRPC.Port, mode)
+
+	DB_Mock := models.DBFunction{}
+	application := app.New(log, cfg.GRPC.Port, DB_Mock, mode)
 
 	go application.GRPCServer.MustRun()
 
