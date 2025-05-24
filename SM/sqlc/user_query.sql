@@ -1,8 +1,8 @@
 -- name: CreateUser :one
 INSERT INTO Users(
-    id, bitrixid, name, role 
+    id, bitrixid,telegramid, name, role 
 ) VALUES (
-    @id, @bitrixid, @name, @role
+    @id, @bitrixid,@telegramid, @name, @role
 )
 RETURNING *;
 -- name: DeleteUser :exec
@@ -20,6 +20,6 @@ ORDER BY id;
 Select * FROM Users
 WHERE role = @role
 ORDER BY id;
--- name: CheckUserRole :one
+-- name: GetUser :one
 SELECT * FROM Users
 WHERE id = @id;

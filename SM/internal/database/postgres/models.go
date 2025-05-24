@@ -236,8 +236,9 @@ type Task struct {
 }
 
 type User struct {
-	ID       int64
-	Bitrixid int64
-	Name     string
-	Role     Userrole
+	ID         int64
+	Bitrixid   pgtype.Int8
+	Telegramid string
+	Name       string
+	Role       Userrole
 }

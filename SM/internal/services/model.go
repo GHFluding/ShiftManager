@@ -12,7 +12,7 @@ type User struct {
 func convertUserDB(inp postgres.User) User {
 	var out User
 	out.ID = inp.ID
-	out.Bitrixid = inp.Bitrixid
+	out.Bitrixid = inp.Bitrixid.Int64
 	out.Name = inp.Name
 	out.Role = string(inp.Name)
 	return out
