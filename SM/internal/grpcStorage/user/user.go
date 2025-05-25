@@ -5,9 +5,9 @@ import (
 	"log/slog"
 
 	"github.com/GHFluding/ShiftManager/SM/internal/database/postgres"
+	"github.com/GHFluding/ShiftManager/SM/internal/utils/convertor"
 	"github.com/GHFluding/ShiftManager/SM/internal/utils/logger"
 	"github.com/GHFluding/ShiftManager/SMgrpc/pkg/domain/models"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Services struct {
@@ -67,15 +67,8 @@ func convertUserParams(bitrixId *int64,
 	if err != nil {
 		return postgres.CreateUserParams{}, err
 	}
-	var bitrixidDB pgtype.Int8
-	if bitrixId == nil {
-		bitrixidDB.Valid = false
-	} else {
-		bitrixidDB.Valid = true
-		bitrixidDB.Int64 = *bitrixId
-	}
 	userParams := postgres.CreateUserParams{
-		Bitrixid:   bitrixidDB,
+		Bitrixid:   convertor.PGInt64(bitrixId),
 		Name:       name,
 		Role:       roleEnum,
 		Telegramid: telegramId,

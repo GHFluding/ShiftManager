@@ -5,9 +5,9 @@ import (
 	"log/slog"
 
 	"github.com/GHFluding/ShiftManager/SM/internal/database/postgres"
+	"github.com/GHFluding/ShiftManager/SM/internal/utils/convertor"
 	"github.com/GHFluding/ShiftManager/SM/internal/utils/logger"
 	"github.com/GHFluding/ShiftManager/SMgrpc/pkg/domain/models"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Services struct {
@@ -50,32 +50,10 @@ func (sp *Services) GetMachine(ctx context.Context, id int64) (models.Machine, e
 func convertMachineParams(name string,
 	isRepairRequired *bool,
 	isActive *bool) postgres.CreateMachineParams {
-	var isRepairRequiredPG pgtype.Bool
-	if isRepairRequired == nil {
-		isRepairRequiredPG = pgtype.Bool{
-			Valid: false,
-		}
-	} else {
-		isRepairRequiredPG = pgtype.Bool{
-			Bool:  true,
-			Valid: false,
-		}
-	}
-	var isActivePG pgtype.Bool
-	if isActive == nil {
-		isActivePG = pgtype.Bool{
-			Valid: false,
-		}
-	} else {
-		isActivePG = pgtype.Bool{
-			Bool:  true,
-			Valid: false,
-		}
-	}
 	machineParams := postgres.CreateMachineParams{
 		Name:             name,
-		Isrepairrequired: isRepairRequiredPG,
-		Isactive:         isActivePG,
+		Isrepairrequired: convertor.PGBool(isRepairRequired),
+		Isactive:         convertor.PGBool(isActive),
 	}
 	return machineParams
 }

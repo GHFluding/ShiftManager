@@ -29,7 +29,7 @@ type TaskSaver interface {
 	)
 }
 type TaskProvider interface {
-	Task(ctx context.Context, id int64) (models.Task, error)
+	GetTask(ctx context.Context, id int64) (models.Task, error)
 }
 
 func New(log *slog.Logger, taskSaver TaskSaver, taskProvider TaskProvider) *TaskApp {
@@ -63,7 +63,7 @@ func (t *TaskApp) Create(ctx context.Context,
 	}
 	log.Info("task is created", slog.Int64("id", id))
 
-	task, err := t.provider.Task(ctx, id)
+	task, err := t.provider.GetTask(ctx, id)
 	if err != nil {
 		log.Error("failed to check task", sl.Err(err))
 		return task_grpc.TaskResponse{}, err

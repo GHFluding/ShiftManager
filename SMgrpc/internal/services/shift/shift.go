@@ -26,7 +26,7 @@ type ShiftSaver interface {
 	)
 }
 type ShiftProvider interface {
-	Shift(ctx context.Context, id int64) (models.Shift, error)
+	GETShift(ctx context.Context, id int64) (models.Shift, error)
 }
 
 func New(log *slog.Logger, shiftSaver ShiftSaver, shiftProvider ShiftProvider) *ShiftApp {
@@ -58,7 +58,7 @@ func (s *ShiftApp) Create(ctx context.Context,
 	}
 	log.Info("shift is created", slog.Int64("id", id))
 
-	shift, err := s.provider.Shift(ctx, id)
+	shift, err := s.provider.GETShift(ctx, id)
 	if err != nil {
 		log.Error("failed to check shift", sl.Err(err))
 		return shift_grpc.ShiftResponse{}, err

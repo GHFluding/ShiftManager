@@ -43,7 +43,6 @@ func (a *App) Run(db_app models.DBFunction) {
 	mode := grpcapp.CommandCode(modeInt)
 	application := New(log, cfg.GRPC.Port, db_app, mode)
 
-	//maybe use run
 	go application.GRPCServer.MustRun()
 
 	stop := make(chan os.Signal, 1)
