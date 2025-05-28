@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"syscall"
 
-	grpcapp "github.com/GHFluding/ShiftManager/SMgrpc/internal/app/grpc"
 	"github.com/GHFluding/ShiftManager/SMgrpc/internal/config"
 	sl "github.com/GHFluding/ShiftManager/SMgrpc/internal/utils/logger"
 	"github.com/GHFluding/ShiftManager/SMgrpc/pkg/app"
@@ -27,7 +26,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	mode := grpcapp.CommandCode(modeInt)
+	mode := models.CommandCode(modeInt)
 
 	DB_Mock := models.DBFunction{}
 	application := app.New(log, cfg.GRPC.Port, DB_Mock, mode)

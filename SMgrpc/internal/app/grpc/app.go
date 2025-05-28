@@ -21,37 +21,17 @@ type App struct {
 	port       int
 }
 
-type CommandCode int
-
-const (
-	MachineServer CommandCode = iota
-	UserServer
-	TaskServer
-	ShiftServer
-)
-
-var commandName = map[CommandCode]string{
-	MachineServer: "machine",
-	UserServer:    "user",
-	TaskServer:    "task",
-	ShiftServer:   "shift",
-}
-
-func (cs CommandCode) String() string {
-	return commandName[cs]
-}
-
-func New(command CommandCode, log *slog.Logger, db_app models.DBFunction, port int) *App {
+func New(command models.CommandCode, log *slog.Logger, db_app models.DBFunction, port int) *App {
 	gRPCServer := grpc.NewServer()
 	switch command {
-	case MachineServer:
+	case models.MachineServer:
 		service := machine_service.New(log, db_app.Machine)
 		machine.RegisterServerAPI(gRPCServer, service)
-	case ShiftServer:
+	case models.ShiftServer:
 		shift.RegisterServerAPI(gRPCServer, db_app.Shift)
-	case UserServer:
+	case models.UserServer:
 		user.RegisterServerAPI(gRPCServer, db_app.User)
-	case TaskServer:
+	case models.TaskServer:
 		task.RegisterServerAPI(gRPCServer, db_app.Task)
 	}
 

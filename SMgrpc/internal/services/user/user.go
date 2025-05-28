@@ -11,27 +11,11 @@ import (
 
 type UserApp struct {
 	log      *slog.Logger
-	saver    UserSaver
-	provider UserProvider
+	saver    models.UserSaver
+	provider models.UserProvider
 }
 
-type UserSaver interface {
-	SaveUser(
-		ctx context.Context,
-		bitrixId *int64,
-		telegramId string,
-		name string,
-		role string,
-	) (
-		id int64,
-		err error,
-	)
-}
-type UserProvider interface {
-	User(ctx context.Context, id int64) (models.User, error)
-}
-
-func New(log *slog.Logger, userSaver UserSaver, userProvider UserProvider) *UserApp {
+func New(log *slog.Logger, userSaver models.UserSaver, userProvider models.UserProvider) *UserApp {
 	return &UserApp{
 		log:      log,
 		saver:    userSaver,
@@ -62,7 +46,7 @@ func (s *UserApp) Create(ctx context.Context,
 	}
 	log.Info("user is created", slog.Int64("id", id))
 
-	user, err := s.provider.User(ctx, id)
+	user, err := s.provider.GetUser(ctx, id)
 	if err != nil {
 		log.Error("failed to check user", sl.Err(err))
 		return user_grpc.UserResponse{}, err

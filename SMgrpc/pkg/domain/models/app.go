@@ -1,11 +1,5 @@
 package models
 
-import (
-	"github.com/GHFluding/ShiftManager/SMgrpc/internal/grpc/sm/shift"
-	"github.com/GHFluding/ShiftManager/SMgrpc/internal/grpc/sm/task"
-	"github.com/GHFluding/ShiftManager/SMgrpc/internal/grpc/sm/user"
-)
-
 type App struct {
 	ID   int
 	Name string
@@ -13,7 +7,27 @@ type App struct {
 
 type DBFunction struct {
 	Machine MachineDB
-	User    user.UserInterface
-	Task    task.TaskInterface
-	Shift   shift.ShiftInterface
+	User    UserDB
+	Task    TaskDB
+	Shift   ShiftDB
+}
+
+type CommandCode int
+
+const (
+	MachineServer CommandCode = iota
+	UserServer
+	TaskServer
+	ShiftServer
+)
+
+var commandName = map[CommandCode]string{
+	MachineServer: "machine",
+	UserServer:    "user",
+	TaskServer:    "task",
+	ShiftServer:   "shift",
+}
+
+func (cs CommandCode) String() string {
+	return commandName[cs]
 }

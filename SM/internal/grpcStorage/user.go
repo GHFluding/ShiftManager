@@ -1,19 +1,13 @@
-package user_grpc
+package grpc_storage
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/GHFluding/ShiftManager/SM/internal/database/postgres"
 	"github.com/GHFluding/ShiftManager/SM/internal/utils/convertor"
 	"github.com/GHFluding/ShiftManager/SM/internal/utils/logger"
 	"github.com/GHFluding/ShiftManager/SMgrpc/pkg/domain/models"
 )
-
-type Services struct {
-	db  *postgres.Queries
-	log *slog.Logger
-}
 
 func (sp *Services) SaveUser(
 	ctx context.Context,

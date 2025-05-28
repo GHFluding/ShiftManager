@@ -4,6 +4,7 @@ import (
 	"context"
 
 	entities "github.com/GHFluding/ShiftManager/SMgrpc/internal/gen"
+	"github.com/GHFluding/ShiftManager/SMgrpc/pkg/domain/models"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -17,24 +18,13 @@ type TaskResponse struct {
 	TaskPriority string
 	Description  string
 }
-type TaskInterface interface {
-	Create(ctx context.Context,
-		machineId int64,
-		shiftId int64,
-		frequency string,
-		taskPriority string,
-		description string,
-	) (
-		TaskResponse,
-		error,
-	)
-}
+
 type serverAPI struct {
 	entities.UnimplementedTaskServiceServer
-	task TaskInterface
+	task models.TaskDB
 }
 
-func RegisterServerAPI(gRPC *grpc.Server, task TaskInterface) {
+func RegisterServerAPI(gRPC *grpc.Server, task models.TaskDB) {
 	entities.RegisterTaskServiceServer(gRPC, &serverAPI{task: task})
 }
 func (s *serverAPI) Create(ctx context.Context, req *entities.CreateTaskParams) (*entities.TaskResponse, error) {
@@ -47,11 +37,14 @@ func (s *serverAPI) Create(ctx context.Context, req *entities.CreateTaskParams) 
 	if req.GetTaskPriority() == "" {
 		return nil, status.Error(codes.InvalidArgument, "name is empty")
 	}
-	task, err := s.task.Create(ctx, req.MachineId, req.ShiftId, req.Frequency, req.TaskPriority, req.Description)
+	taskID, err := s.task.Saver.SaveTask(ctx, req.MachineId, req.ShiftId, req.Frequency, req.TaskPriority, req.Description)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "internal error")
 	}
-
+	task, err := s.task.Provider.GetTask(ctx, taskID)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "internal error")
+	}
 	return &entities.TaskResponse{
 		Data: &entities.CreateTaskParams{
 			MachineId:    task.MachineId,

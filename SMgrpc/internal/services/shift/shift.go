@@ -11,25 +11,11 @@ import (
 
 type ShiftApp struct {
 	log      *slog.Logger
-	saver    ShiftSaver
-	provider ShiftProvider
+	saver    models.ShiftSaver
+	provider models.ShiftProvider
 }
 
-type ShiftSaver interface {
-	SaveShift(
-		ctx context.Context,
-		machineId int64,
-		shiftMasterID int64,
-	) (
-		id int64,
-		err error,
-	)
-}
-type ShiftProvider interface {
-	GETShift(ctx context.Context, id int64) (models.Shift, error)
-}
-
-func New(log *slog.Logger, shiftSaver ShiftSaver, shiftProvider ShiftProvider) *ShiftApp {
+func New(log *slog.Logger, shiftSaver models.ShiftSaver, shiftProvider models.ShiftProvider) *ShiftApp {
 	return &ShiftApp{
 		log:      log,
 		saver:    shiftSaver,

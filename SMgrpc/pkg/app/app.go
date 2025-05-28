@@ -18,7 +18,7 @@ type App struct {
 }
 
 // New creates a new variable of type *App
-func New(log *slog.Logger, grpcPort int, db_app models.DBFunction, command grpcapp.CommandCode) *App {
+func New(log *slog.Logger, grpcPort int, db_app models.DBFunction, command models.CommandCode) *App {
 	grpcApp := grpcapp.New(command, log, db_app, grpcPort)
 
 	return &App{
@@ -40,7 +40,7 @@ func (a *App) Run(db_app models.DBFunction) {
 	if err != nil {
 		panic(err)
 	}
-	mode := grpcapp.CommandCode(modeInt)
+	mode := models.CommandCode(modeInt)
 	application := New(log, cfg.GRPC.Port, db_app, mode)
 
 	go application.GRPCServer.MustRun()

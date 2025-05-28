@@ -11,28 +11,11 @@ import (
 
 type TaskApp struct {
 	log      *slog.Logger
-	saver    TaskSaver
-	provider TaskProvider
+	saver    models.TaskSaver
+	provider models.TaskProvider
 }
 
-type TaskSaver interface {
-	SaveTask(
-		ctx context.Context,
-		machineId int64,
-		shiftId int64,
-		frequency string,
-		taskPriority string,
-		description string,
-	) (
-		id int64,
-		err error,
-	)
-}
-type TaskProvider interface {
-	GetTask(ctx context.Context, id int64) (models.Task, error)
-}
-
-func New(log *slog.Logger, taskSaver TaskSaver, taskProvider TaskProvider) *TaskApp {
+func New(log *slog.Logger, taskSaver models.TaskSaver, taskProvider models.TaskProvider) *TaskApp {
 	return &TaskApp{
 		log:      log,
 		saver:    taskSaver,
