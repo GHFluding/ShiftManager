@@ -2,13 +2,12 @@ package client
 
 import (
 	"context"
-	"time"
 
 	entities "github.com/GHFluding/ShiftManager/SMgrpc/internal/gen"
 )
 
 func (c *Client) CreateTask(ctx context.Context, machineID, shiftID, createdBy int64, frequency, priority, description string) (*entities.TaskResponse, error) {
-	ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
 	req := &entities.CreateTaskParams{

@@ -1,6 +1,8 @@
 package client
 
 import (
+	"time"
+
 	"google.golang.org/grpc"
 
 	entities "github.com/GHFluding/ShiftManager/SMgrpc/internal/gen"
@@ -38,3 +40,5 @@ func New(target string) (*Client, error) {
 func (c *Client) Close() error {
 	return c.conn.Close()
 }
+
+const timeout = 3 * time.Second

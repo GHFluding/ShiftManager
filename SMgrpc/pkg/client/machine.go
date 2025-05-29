@@ -2,13 +2,12 @@ package client
 
 import (
 	"context"
-	"time"
 
 	entities "github.com/GHFluding/ShiftManager/SMgrpc/internal/gen"
 )
 
 func (c *Client) CreateMachine(ctx context.Context, name string, isRepairRequired, isActive *bool) (*entities.MachineResponse, error) {
-	ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
 	req := &entities.CreateMachine{
