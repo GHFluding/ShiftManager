@@ -2,6 +2,7 @@ package services
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,6 +11,7 @@ import (
 
 	"log/slog"
 
+	"github.com/GHFluding/ShiftManager/SMgrpc/pkg/client"
 	logger "github.com/GHFluding/ShiftManager/link/internal/utils"
 )
 
@@ -62,6 +64,35 @@ func CreateMachine(data []byte, log *slog.Logger, url string) ([]byte, error) {
 	log.Info("Request processed successfully",
 		slog.Int("response_size", len(responseData)),
 		slog.Int("status", resp.StatusCode))
+
+	return responseData, nil
+}
+
+func CreateMachineGRPC(c *client.Client, data []byte, log *slog.Logger, url string) ([]byte, error) {
+	log.Info("Start processing machine creation request")
+
+	machine, err := marshalCreateMachine(data, log)
+	if err != nil {
+		return nil, err
+	}
+	if machine.IsActive == nil {
+		log.Info("Isactive is not set. Using default value")
+	}
+	if machine.IsRepairRequired == nil {
+		log.Info("IsRepairRequired is not set. Using default value")
+	}
+
+	resp, err := c.CreateMachine(context.Background(), machine.Name, machine.IsRepairRequired, machine.IsActive)
+	if err != nil {
+		log.Error("GRPC request failed", logger.ErrToAttr(err))
+		return nil, fmt.Errorf("service unavailable: %w", err)
+	}
+	//using only response data for marshaling
+	responseData, err := json.Marshal(resp.Data)
+	if err != nil {
+		log.Error("Failed to marshal response", logger.ErrToAttr(err))
+		return nil, fmt.Errorf("response marshal failed: %w", err)
+	}
 
 	return responseData, nil
 }

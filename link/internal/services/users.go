@@ -1,15 +1,13 @@
 package services
 
 import (
-	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
-	"time"
 
 	"log/slog"
 
+	"github.com/GHFluding/ShiftManager/SMgrpc/pkg/client"
 	logger "github.com/GHFluding/ShiftManager/link/internal/utils"
 )
 
@@ -20,45 +18,29 @@ type createUserParams struct {
 	Role       string `json:"role"`
 }
 
-func CreateUser(data []byte, log *slog.Logger, url string) ([]byte, error) {
+func CreateUser(c *client.Client, data []byte, log *slog.Logger, url string) ([]byte, error) {
 	log.Info("Start processing user creation request")
 	user, err := marshalCreateUser(data, log)
 	if err != nil {
 		return nil, err
 	}
-	requestBody, err := json.Marshal(user)
-	if err != nil {
-		log.Error("JSON marshal error", logger.ErrToAttr(err))
-		return nil, fmt.Errorf("data encoding failed: %w", err)
-	}
+
 	if user.Bitrixid == nil {
 		log.Info("BitrixID is not set. This user use only telegram")
 	}
-	client := &http.Client{Timeout: 10 * time.Second}
-	resp, err := client.Post(url, "application/json", bytes.NewReader(requestBody))
+
+	resp, err := c.CreateUser(context.Background(), user.Name, user.Role, user.TelegramID, user.Bitrixid)
 	if err != nil {
-		log.Error("HTTP request failed", logger.ErrToAttr(err))
+		log.Error("GRPC request failed", logger.ErrToAttr(err))
 		return nil, fmt.Errorf("service unavailable: %w", err)
 	}
-	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		body, _ := io.ReadAll(resp.Body)
-		log.Error("Service error response",
-			slog.Int("status", resp.StatusCode),
-			slog.String("response", string(body)))
-		return nil, fmt.Errorf("service returned %d status: %s", resp.StatusCode, string(body))
-	}
-
-	responseData, err := io.ReadAll(resp.Body)
+	//using only response data for marshaling
+	responseData, err := json.Marshal(resp.Data)
 	if err != nil {
-		log.Error("Failed to read response", logger.ErrToAttr(err))
-		return nil, fmt.Errorf("response read failed: %w", err)
+		log.Error("Failed to marshal response", logger.ErrToAttr(err))
+		return nil, fmt.Errorf("response marshal failed: %w", err)
 	}
-
-	log.Info("User created successfully",
-		slog.Int("response_size", len(responseData)),
-		slog.Int("status", resp.StatusCode))
 
 	return responseData, nil
 }

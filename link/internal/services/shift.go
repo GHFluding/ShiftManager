@@ -2,6 +2,7 @@ package services
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,6 +11,7 @@ import (
 
 	"log/slog"
 
+	"github.com/GHFluding/ShiftManager/SMgrpc/pkg/client"
 	logger "github.com/GHFluding/ShiftManager/link/internal/utils"
 )
 
@@ -57,6 +59,29 @@ func CreateShift(data []byte, log *slog.Logger, url string) ([]byte, error) {
 		slog.Int("response_size", len(responseData)),
 		slog.Int("status", resp.StatusCode))
 
+	return responseData, nil
+}
+
+func CreateShiftGRPC(c *client.Client, data []byte, log *slog.Logger, url string) ([]byte, error) {
+	log.Info("Start processing shift creation request")
+
+	shift, err := marshalCreateShift(data, log)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.CreateShift(context.Background(), shift.Machineid, shift.ShiftMaster)
+	if err != nil {
+		log.Error("GRPC request failed", logger.ErrToAttr(err))
+		return nil, fmt.Errorf("service unavailable: %w", err)
+	}
+
+	//using only response data for marshaling
+	responseData, err := json.Marshal(resp.Data)
+	if err != nil {
+		log.Error("Failed to marshal response", logger.ErrToAttr(err))
+		return nil, fmt.Errorf("response marshal failed: %w", err)
+	}
 	return responseData, nil
 }
 
