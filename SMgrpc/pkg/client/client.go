@@ -5,7 +5,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	entities "github.com/GHFluding/ShiftManager/SMgrpc/internal/gen"
+	entities "github.com/GHFluding/ShiftManager/SMgrpc/pkg/gen"
 )
 
 type Client struct {

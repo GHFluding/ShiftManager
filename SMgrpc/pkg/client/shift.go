@@ -3,7 +3,7 @@ package client
 import (
 	"context"
 
-	entities "github.com/GHFluding/ShiftManager/SMgrpc/internal/gen"
+	entities "github.com/GHFluding/ShiftManager/SMgrpc/pkg/gen"
 )
 
 func (c *Client) CreateShift(ctx context.Context, machineID, shiftMasterID int64) (*entities.ShiftResponse, error) {

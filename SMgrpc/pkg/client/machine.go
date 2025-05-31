@@ -3,7 +3,7 @@ package client
 import (
 	"context"
 
-	entities "github.com/GHFluding/ShiftManager/SMgrpc/internal/gen"
+	entities "github.com/GHFluding/ShiftManager/SMgrpc/pkg/gen"
 )
 
 func (c *Client) CreateMachine(ctx context.Context, name string, isRepairRequired, isActive *bool) (*entities.MachineResponse, error) {

@@ -3,7 +3,7 @@ package client
 import (
 	"context"
 
-	entities "github.com/GHFluding/ShiftManager/SMgrpc/internal/gen"
+	entities "github.com/GHFluding/ShiftManager/SMgrpc/pkg/gen"
 )
 
 func (c *Client) CreateUser(ctx context.Context, name, role, telegramID string, bitrixID *int64) (*entities.UserResponse, error) {
