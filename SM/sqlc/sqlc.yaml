@@ -10,5 +10,5 @@ sql:
     gen:
       go:
         package: "postgres"
-        out: "../../internal/database/postgres"
+        out: "../internal/database/postgres"
         sql_package: "pgx/v5"

@@ -1,6 +1,6 @@
 package services
 
-import "sm/internal/database/postgres"
+import "github.com/GHFluding/ShiftManager/SM/internal/database/postgres"
 
 type User struct {
 	ID       int64
@@ -12,7 +12,7 @@ type User struct {
 func convertUserDB(inp postgres.User) User {
 	var out User
 	out.ID = inp.ID
-	out.Bitrixid = inp.Bitrixid
+	out.Bitrixid = inp.Bitrixid.Int64
 	out.Name = inp.Name
 	out.Role = string(inp.Name)
 	return out

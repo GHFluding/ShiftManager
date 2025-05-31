@@ -5,7 +5,8 @@ CREATE TYPE TaskStatus AS ENUM ('todo', 'inProgress', 'failed', 'completed', 've
 
 CREATE TABLE Users(
     id BIGSERIAL PRIMARY KEY,
-    bitrixid BIGINT NOT NULL,
+    bitrixid BIGINT,
+    telegramid TEXT NOT NULL,
     name TEXT NOT NULL,
     role UserRole NOT NULL
 );

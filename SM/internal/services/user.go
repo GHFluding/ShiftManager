@@ -3,8 +3,10 @@ package services
 import (
 	"context"
 	"errors"
-	"sm/internal/database/postgres"
-	"sm/internal/utils/logger"
+
+	"github.com/GHFluding/ShiftManager/SM/internal/database/postgres"
+	"github.com/GHFluding/ShiftManager/SM/internal/utils/logger"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 func DeleteUser(sp *ServicesParams, userid int64) error {
@@ -68,7 +70,7 @@ func convertCreateUserParams(req User) (postgres.CreateUserParams, error) {
 	}
 	return postgres.CreateUserParams{
 		ID:       req.ID,
-		Bitrixid: req.Bitrixid,
+		Bitrixid: pgtype.Int8{Int64: req.Bitrixid, Valid: true},
 		Name:     req.Name,
 		Role:     role,
 	}, nil
@@ -92,7 +94,7 @@ func detectUserRole(sRole string) (postgres.Userrole, bool) {
 }
 
 func CheckUserRole(sp *ServicesParams, userId int64) (string, error) {
-	user, err := sp.db.CheckUserRole(context.Background(), userId)
+	user, err := sp.db.GetUser(context.Background(), userId)
 	if err != nil {
 		return "", err
 	}

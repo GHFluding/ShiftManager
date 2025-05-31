@@ -51,3 +51,6 @@ ORDER BY taskId;
 -- name: DeleteShiftTask :exec
 DELETE FROM Shift_tasks
 WHERE shiftId = @shiftId AND taskId = @taskId;
+-- name: GetShift :one
+SELECT * FROM Shifts
+WHERE id = @id;

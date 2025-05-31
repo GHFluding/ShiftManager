@@ -1,10 +1,10 @@
 package main
 
 import (
-	"linkSM/internal/config"
-	"linkSM/internal/services"
-	"linkSM/internal/transport/webhooks"
-	logger "linkSM/internal/utils"
+	"github.com/GHFluding/ShiftManager/link/internal/config"
+	"github.com/GHFluding/ShiftManager/link/internal/services"
+	"github.com/GHFluding/ShiftManager/link/internal/transport/webhooks"
+	logger "github.com/GHFluding/ShiftManager/link/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )

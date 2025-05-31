@@ -1,10 +1,10 @@
 package main
 
 import (
-	config "bsm/internal/config/loadconfig"
-	logger "bsm/internal/utils"
+	config "github.com/GHFluding/ShiftManager/bitrixSM/internal/config/loadconfig"
+	logger "github.com/GHFluding/ShiftManager/bitrixSM/internal/utils"
 
-	apilogic "bsm/internal/services/apiLogic"
+	apilogic "github.com/GHFluding/ShiftManager/bitrixSM/internal/services/apiLogic"
 
 	"log"
 

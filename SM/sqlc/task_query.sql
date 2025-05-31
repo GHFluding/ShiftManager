@@ -51,3 +51,6 @@ SET
     verifiedAt = CURRENT_DATE,
     verifiedBy = @verifiedBy
 WHERE id = @id;
+-- name: GetTask :one
+SELECT * FROM Tasks
+WHERE id = @id;
