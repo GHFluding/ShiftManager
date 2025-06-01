@@ -69,21 +69,17 @@ func CreateMachine(data []byte, log *slog.Logger, url string) ([]byte, error) {
 	return responseData, nil
 }
 
-func CreateMachineGRPC(c *client.Client, data []byte, log *slog.Logger, url string) (*entities.MachineResponse, error) {
+func CreateMachineGRPC(c *client.Client, data *entities.CreateMachine, log *slog.Logger, url string) (*entities.MachineResponse, error) {
 	log.Info("Start processing machine creation request")
 
-	machine, err := marshalCreateMachine(data, log)
-	if err != nil {
-		return nil, err
-	}
-	if machine.IsActive == nil {
+	if data.IsActive == nil {
 		log.Info("Isactive is not set. Using default value")
 	}
-	if machine.IsRepairRequired == nil {
+	if data.IsRepairRequired == nil {
 		log.Info("IsRepairRequired is not set. Using default value")
 	}
 
-	resp, err := c.CreateMachine(context.Background(), machine.Name, machine.IsRepairRequired, machine.IsActive)
+	resp, err := c.CreateMachine(context.Background(), data.Name, data.IsRepairRequired, data.IsActive)
 	if err != nil {
 		log.Error("GRPC request failed", logger.ErrToAttr(err))
 		return nil, fmt.Errorf("service unavailable: %w", err)
