@@ -12,6 +12,7 @@ import (
 	"log/slog"
 
 	"github.com/GHFluding/ShiftManager/SMgrpc/pkg/client"
+	entities "github.com/GHFluding/ShiftManager/SMgrpc/pkg/gen"
 	logger "github.com/GHFluding/ShiftManager/link/internal/utils"
 )
 
@@ -66,28 +67,21 @@ func CreateTask(data []byte, log *slog.Logger, url string) ([]byte, error) {
 	return responseData, nil
 }
 
-func CreateTaskGRPC(c *client.Client, data []byte, log *slog.Logger, url string) ([]byte, error) {
+func CreateTaskGRPC(c *client.Client, task *entities.CreateTaskParams, log *slog.Logger, url string) (*entities.TaskResponse, error) {
 	log.Info("Start processing task creation request")
 
-	task, err := marshalCreateTask(data, log)
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := c.CreateTask(context.Background(), task.Machineid, task.Shiftid, task.Createdby, task.Frequency, task.Taskpriority, task.Description)
+	resp, err := c.CreateTask(context.Background(), task.MachineId,
+		task.ShiftId,
+		task.CreatedBy,
+		task.Frequency,
+		task.TaskPriority,
+		task.Description)
 	if err != nil {
 		log.Error("GRPC request failed", logger.ErrToAttr(err))
 		return nil, fmt.Errorf("service unavailable: %w", err)
 	}
 
-	//using only response data for marshaling
-	responseData, err := json.Marshal(resp.Data)
-	if err != nil {
-		log.Error("Failed to marshal response", logger.ErrToAttr(err))
-		return nil, fmt.Errorf("response marshal failed: %w", err)
-	}
-
-	return responseData, nil
+	return resp, nil
 }
 
 func marshalCreateTask(data []byte, log *slog.Logger) (createTaskParams, error) {

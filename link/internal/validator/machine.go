@@ -21,18 +21,17 @@ func (m machineDefault) ToGRPCCreateParams() *entities.CreateMachine {
 		IsRepairRequired: m.IsRepairRequired,
 		IsActive:         m.IsActive,
 	}
-
 }
 
 func Machine(data []byte, log *slog.Logger) (machineDefault, error) {
-	machine, err := marshalCreateMachine(data, log)
+	machine, err := marshalMachine(data, log)
 	if err != nil {
 		return machineDefault{}, err
 	}
 	return machine, err
 }
 
-func marshalCreateMachine(data []byte, log *slog.Logger) (machineDefault, error) {
+func marshalMachine(data []byte, log *slog.Logger) (machineDefault, error) {
 
 	var machine machineDefault
 	if err := json.Unmarshal(data, &machine); err != nil {
