@@ -9,34 +9,27 @@ import (
 	logger "github.com/GHFluding/ShiftManager/link/internal/utils"
 )
 
-type MachineCode int
-
-const (
-	Create = iota
-)
-
 type machineDefault struct {
 	Name             string
 	IsRepairRequired *bool
 	IsActive         *bool
 }
 
-func Machine(command MachineCode, data []byte, log *slog.Logger) (any, error) {
-	machine, err := marshalCreateMachine(data, log)
-	if err != nil {
-		return nil, err
-	}
-	switch command {
-	case Create:
-		return &entities.CreateMachine{
-			Name:             machine.Name,
-			IsRepairRequired: machine.IsRepairRequired,
-			IsActive:         machine.IsActive,
-		}, err
-	default:
-		return nil, err
+func (m machineDefault) ToGRPCCreateParams() *entities.CreateMachine {
+	return &entities.CreateMachine{
+		Name:             m.Name,
+		IsRepairRequired: m.IsRepairRequired,
+		IsActive:         m.IsActive,
 	}
 
+}
+
+func Machine(data []byte, log *slog.Logger) (machineDefault, error) {
+	machine, err := marshalCreateMachine(data, log)
+	if err != nil {
+		return machineDefault{}, err
+	}
+	return machine, err
 }
 
 func marshalCreateMachine(data []byte, log *slog.Logger) (machineDefault, error) {
