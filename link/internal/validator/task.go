@@ -30,14 +30,14 @@ func (t taskDefault) ToGRPCCreateParams() *entities.CreateTaskParams {
 }
 
 func Task(data []byte, log *slog.Logger) (taskDefault, error) {
-	task, err := marshalCreateTask(data, log)
+	task, err := marshalTask(data, log)
 	if err != nil {
 		return taskDefault{}, err
 	}
 	return task, err
 }
 
-func marshalCreateTask(data []byte, log *slog.Logger) (taskDefault, error) {
+func marshalTask(data []byte, log *slog.Logger) (taskDefault, error) {
 	var task taskDefault
 	if err := json.Unmarshal(data, &task); err != nil {
 		log.Error("JSON unmarshal error", logger.ErrToAttr(err))

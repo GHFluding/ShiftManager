@@ -25,6 +25,14 @@ func (u userDefault) ToGRPCCreateParams() *entities.CreateUserParams {
 	}
 }
 
+func User(data []byte, log *slog.Logger) (userDefault, error) {
+	user, err := marshalUser(data, log)
+	if err != nil {
+		return userDefault{}, err
+	}
+	return user, err
+}
+
 func marshalUser(data []byte, log *slog.Logger) (userDefault, error) {
 	var user userDefault
 	if err := json.Unmarshal(data, &user); err != nil {

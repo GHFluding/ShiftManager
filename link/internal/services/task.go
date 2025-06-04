@@ -67,15 +67,10 @@ func CreateTask(data []byte, log *slog.Logger, url string) ([]byte, error) {
 	return responseData, nil
 }
 
-func CreateTaskGRPC(c *client.Client, task *entities.CreateTaskParams, log *slog.Logger, url string) (*entities.TaskResponse, error) {
+func CreateTaskGRPC(c *client.Client, data *entities.CreateTaskParams, log *slog.Logger) (*entities.TaskResponse, error) {
 	log.Info("Start processing task creation request")
 
-	resp, err := c.CreateTask(context.Background(), task.MachineId,
-		task.ShiftId,
-		task.CreatedBy,
-		task.Frequency,
-		task.TaskPriority,
-		task.Description)
+	resp, err := c.CreateTask(context.Background(), data)
 	if err != nil {
 		log.Error("GRPC request failed", logger.ErrToAttr(err))
 		return nil, fmt.Errorf("service unavailable: %w", err)

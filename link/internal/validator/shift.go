@@ -22,14 +22,14 @@ func (s shiftDefault) ToGRPCCreateParams() *entities.CreateShiftParams {
 }
 
 func Shift(data []byte, log *slog.Logger) (shiftDefault, error) {
-	shift, err := marshalCreateShift(data, log)
+	shift, err := marshalShift(data, log)
 	if err != nil {
 		return shiftDefault{}, err
 	}
 	return shift, err
 }
 
-func marshalCreateShift(data []byte, log *slog.Logger) (shiftDefault, error) {
+func marshalShift(data []byte, log *slog.Logger) (shiftDefault, error) {
 	var shift shiftDefault
 	if err := json.Unmarshal(data, &shift); err != nil {
 		log.Error("JSON unmarshal error", logger.ErrToAttr(err))

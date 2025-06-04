@@ -8,6 +8,7 @@ import (
 	"log/slog"
 
 	"github.com/GHFluding/ShiftManager/SMgrpc/pkg/client"
+	entities "github.com/GHFluding/ShiftManager/SMgrpc/pkg/gen"
 	logger "github.com/GHFluding/ShiftManager/link/internal/utils"
 )
 
@@ -18,31 +19,20 @@ type createUserParams struct {
 	Role       string `json:"role"`
 }
 
-func CreateUser(c *client.Client, data []byte, log *slog.Logger, url string) ([]byte, error) {
+func CreateUserGRPC(c *client.Client, data *entities.CreateUserParams, log *slog.Logger) (*entities.UserResponse, error) {
 	log.Info("Start processing user creation request")
-	user, err := marshalCreateUser(data, log)
-	if err != nil {
-		return nil, err
-	}
 
-	if user.Bitrixid == nil {
+	if data.BitrixId == nil {
 		log.Info("BitrixID is not set. This user use only telegram")
 	}
 
-	resp, err := c.CreateUser(context.Background(), user.Name, user.Role, user.TelegramID, user.Bitrixid)
+	resp, err := c.CreateUser(context.Background(), data)
 	if err != nil {
 		log.Error("GRPC request failed", logger.ErrToAttr(err))
 		return nil, fmt.Errorf("service unavailable: %w", err)
 	}
 
-	//using only response data for marshaling
-	responseData, err := json.Marshal(resp.Data)
-	if err != nil {
-		log.Error("Failed to marshal response", logger.ErrToAttr(err))
-		return nil, fmt.Errorf("response marshal failed: %w", err)
-	}
-
-	return responseData, nil
+	return resp, nil
 }
 
 func marshalCreateUser(data []byte, log *slog.Logger) (createUserParams, error) {

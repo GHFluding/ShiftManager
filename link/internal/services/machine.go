@@ -22,7 +22,7 @@ type createMachineParams struct {
 	IsActive         *bool  `json:"isactive,omitempty"`
 }
 
-func CreateMachine(data []byte, log *slog.Logger, url string) ([]byte, error) {
+func CreateMachine(data []byte, log *slog.Logger) ([]byte, error) {
 	log.Info("Start processing machine creation request")
 
 	machine, err := marshalCreateMachine(data, log)
@@ -69,7 +69,7 @@ func CreateMachine(data []byte, log *slog.Logger, url string) ([]byte, error) {
 	return responseData, nil
 }
 
-func CreateMachineGRPC(c *client.Client, data *entities.CreateMachine, log *slog.Logger, url string) (*entities.MachineResponse, error) {
+func CreateMachineGRPC(c *client.Client, data *entities.CreateMachine, log *slog.Logger) (*entities.MachineResponse, error) {
 	log.Info("Start processing machine creation request")
 
 	if data.IsActive == nil {
@@ -79,7 +79,7 @@ func CreateMachineGRPC(c *client.Client, data *entities.CreateMachine, log *slog
 		log.Info("IsRepairRequired is not set. Using default value")
 	}
 
-	resp, err := c.CreateMachine(context.Background(), data.Name, data.IsRepairRequired, data.IsActive)
+	resp, err := c.CreateMachine(context.Background(), data)
 	if err != nil {
 		log.Error("GRPC request failed", logger.ErrToAttr(err))
 		return nil, fmt.Errorf("service unavailable: %w", err)

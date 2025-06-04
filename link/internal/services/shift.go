@@ -58,13 +58,10 @@ type createShiftParams struct {
 // 	return responseData, nil
 // }
 
-func CreateShiftGRPC(c *client.Client,
-	data *entities.CreateShiftParams,
-	log *slog.Logger,
-	url string) (*entities.ShiftResponse, error) {
+func CreateShiftGRPC(c *client.Client, data *entities.CreateShiftParams, log *slog.Logger) (*entities.ShiftResponse, error) {
 	log.Info("Start processing shift creation request")
 
-	resp, err := c.CreateShift(context.Background(), data.MachineId, data.ShiftMaster)
+	resp, err := c.CreateShift(context.Background(), data)
 	if err != nil {
 		log.Error("GRPC request failed", logger.ErrToAttr(err))
 		return nil, fmt.Errorf("service unavailable: %w", err)
