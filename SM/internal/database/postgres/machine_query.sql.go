@@ -71,6 +71,23 @@ func (q *Queries) DeleteMachine(ctx context.Context, id int64) error {
 	return err
 }
 
+const getMachine = `-- name: GetMachine :one
+SELECT id, name, isrepairrequired, isactive FROM Machine
+WHERE id = $1
+`
+
+func (q *Queries) GetMachine(ctx context.Context, id int64) (Machine, error) {
+	row := q.db.QueryRow(ctx, getMachine, id)
+	var i Machine
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Isrepairrequired,
+		&i.Isactive,
+	)
+	return i, err
+}
+
 const machineNeedRepair = `-- name: MachineNeedRepair :exec
 UPDATE Machine
 SET 

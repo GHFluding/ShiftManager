@@ -4,8 +4,9 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"sm/internal/config"
-	"sm/internal/utils/logger"
+
+	"github.com/GHFluding/ShiftManager/SM/internal/config"
+	"github.com/GHFluding/ShiftManager/SM/internal/utils/logger"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )

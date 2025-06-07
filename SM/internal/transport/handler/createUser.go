@@ -4,9 +4,10 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
-	"sm/internal/services"
-	"sm/internal/utils/handler_utils"
-	"sm/internal/utils/logger"
+
+	"github.com/GHFluding/ShiftManager/SM/internal/services"
+	"github.com/GHFluding/ShiftManager/SM/internal/utils/handler_utils"
+	"github.com/GHFluding/ShiftManager/SM/internal/utils/logger"
 
 	"github.com/gin-gonic/gin"
 )

@@ -1,10 +1,11 @@
 package apilogic
 
 import (
-	config "bsm/internal/config/loadconfig"
-	bot_command "bsm/internal/services/command"
 	"log/slog"
 	"strings"
+
+	config "github.com/GHFluding/ShiftManager/bitrixSM/internal/config/loadconfig"
+	bot_command "github.com/GHFluding/ShiftManager/bitrixSM/internal/services/command"
 )
 
 func spreadingMessage(cfg *config.Config, msg IncomingMessage, log *slog.Logger) {

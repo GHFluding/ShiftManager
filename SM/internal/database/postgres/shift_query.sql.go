@@ -172,6 +172,25 @@ func (q *Queries) DeleteShiftWorker(ctx context.Context, arg DeleteShiftWorkerPa
 	return err
 }
 
+const getShift = `-- name: GetShift :one
+SELECT id, machineid, shift_master, createdat, isactive, deactivatedat FROM Shifts
+WHERE id = $1
+`
+
+func (q *Queries) GetShift(ctx context.Context, id int64) (Shift, error) {
+	row := q.db.QueryRow(ctx, getShift, id)
+	var i Shift
+	err := row.Scan(
+		&i.ID,
+		&i.Machineid,
+		&i.ShiftMaster,
+		&i.Createdat,
+		&i.Isactive,
+		&i.Deactivatedat,
+	)
+	return i, err
+}
+
 const shiftList = `-- name: ShiftList :many
 Select id, machineid, shift_master, createdat, isactive, deactivatedat FROM Shifts
 ORDER BY id

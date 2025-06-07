@@ -1,15 +1,15 @@
 package services
 
 import (
-	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
-	"time"
 
-	logger "linkSM/internal/utils"
 	"log/slog"
+
+	"github.com/GHFluding/ShiftManager/SMgrpc/pkg/client"
+	entities "github.com/GHFluding/ShiftManager/SMgrpc/pkg/gen"
+	logger "github.com/GHFluding/ShiftManager/link/internal/utils"
 )
 
 type createUserParams struct {
@@ -19,47 +19,20 @@ type createUserParams struct {
 	Role       string `json:"role"`
 }
 
-func CreateUser(data []byte, log *slog.Logger, url string) ([]byte, error) {
+func CreateUserGRPC(c *client.Client, data *entities.CreateUserParams, log *slog.Logger) (*entities.UserResponse, error) {
 	log.Info("Start processing user creation request")
-	user, err := marshalCreateUser(data, log)
-	if err != nil {
-		return nil, err
-	}
-	requestBody, err := json.Marshal(user)
-	if err != nil {
-		log.Error("JSON marshal error", logger.ErrToAttr(err))
-		return nil, fmt.Errorf("data encoding failed: %w", err)
-	}
-	if user.Bitrixid == nil {
+
+	if data.BitrixId == nil {
 		log.Info("BitrixID is not set. This user use only telegram")
 	}
-	client := &http.Client{Timeout: 10 * time.Second}
-	resp, err := client.Post(url, "application/json", bytes.NewReader(requestBody))
+
+	resp, err := c.CreateUser(context.Background(), data)
 	if err != nil {
-		log.Error("HTTP request failed", logger.ErrToAttr(err))
+		log.Error("GRPC request failed", logger.ErrToAttr(err))
 		return nil, fmt.Errorf("service unavailable: %w", err)
 	}
-	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		body, _ := io.ReadAll(resp.Body)
-		log.Error("Service error response",
-			slog.Int("status", resp.StatusCode),
-			slog.String("response", string(body)))
-		return nil, fmt.Errorf("service returned %d status: %s", resp.StatusCode, string(body))
-	}
-
-	responseData, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Error("Failed to read response", logger.ErrToAttr(err))
-		return nil, fmt.Errorf("response read failed: %w", err)
-	}
-
-	log.Info("User created successfully",
-		slog.Int("response_size", len(responseData)),
-		slog.Int("status", resp.StatusCode))
-
-	return responseData, nil
+	return resp, nil
 }
 
 func marshalCreateUser(data []byte, log *slog.Logger) (createUserParams, error) {

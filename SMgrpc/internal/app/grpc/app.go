@@ -4,10 +4,13 @@ import (
 	"fmt"
 	"log/slog"
 	"net"
-	"smgrpc/internal/grpc/sm/machine"
-	"smgrpc/internal/grpc/sm/shift"
-	"smgrpc/internal/grpc/sm/task"
-	"smgrpc/internal/grpc/sm/user"
+
+	"github.com/GHFluding/ShiftManager/SMgrpc/internal/grpc/sm/machine"
+	"github.com/GHFluding/ShiftManager/SMgrpc/internal/grpc/sm/shift"
+	"github.com/GHFluding/ShiftManager/SMgrpc/internal/grpc/sm/task"
+	"github.com/GHFluding/ShiftManager/SMgrpc/internal/grpc/sm/user"
+	machine_service "github.com/GHFluding/ShiftManager/SMgrpc/internal/services/machine"
+	"github.com/GHFluding/ShiftManager/SMgrpc/pkg/domain/models"
 
 	"google.golang.org/grpc"
 )
@@ -18,37 +21,18 @@ type App struct {
 	port       int
 }
 
-type CommandCode int
-
-const (
-	MachineServer CommandCode = iota
-	UserServer
-	TaskServer
-	ShiftServer
-)
-
-var commandName = map[CommandCode]string{
-	MachineServer: "machine",
-	UserServer:    "user",
-	TaskServer:    "task",
-	ShiftServer:   "shift",
-}
-
-func (cs CommandCode) String() string {
-	return commandName[cs]
-}
-
-func New(command CommandCode, log *slog.Logger, port int) *App {
+func New(command models.CommandCode, log *slog.Logger, db_app models.DBFunction, port int) *App {
 	gRPCServer := grpc.NewServer()
 	switch command {
-	case MachineServer:
-		machine.RegisterServerAPI(gRPCServer)
-	case ShiftServer:
-		shift.RegisterServerAPI(gRPCServer)
-	case UserServer:
-		user.RegisterServerAPI(gRPCServer)
-	case TaskServer:
-		task.RegisterServerAPI(gRPCServer)
+	case models.MachineServer:
+		service := machine_service.New(log, db_app.Machine)
+		machine.RegisterServerAPI(gRPCServer, service)
+	case models.ShiftServer:
+		shift.RegisterServerAPI(gRPCServer, db_app.Shift)
+	case models.UserServer:
+		user.RegisterServerAPI(gRPCServer, db_app.User)
+	case models.TaskServer:
+		task.RegisterServerAPI(gRPCServer, db_app.Task)
 	}
 
 	return &App{
