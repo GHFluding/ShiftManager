@@ -2,6 +2,7 @@ package webhooks
 
 import (
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	"net/http"
 
@@ -53,14 +54,7 @@ func ProcessWebhookGRPC(log *slog.Logger, url string) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Unsupported action"})
 			return
 		}
-		data, err := c.GetRawData()
-		if err != nil {
-			reqLog.Error("Failed to read request body", logger.ErrToAttr(err))
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
-			return
-		}
-
-		outData, err := processingFunc(cl, data, reqLog)
+		outData, err := processingFunc(cl, c, reqLog)
 		if err != nil {
 			reqLog.Error("Processing failed", logger.ErrToAttr(err))
 			c.JSON(http.StatusInternalServerError, gin.H{
@@ -74,7 +68,11 @@ func ProcessWebhookGRPC(log *slog.Logger, url string) gin.HandlerFunc {
 	}
 }
 
-func processMachineCreate(c *client.Client, data []byte, log *slog.Logger) ([]byte, error) {
+func processMachineCreate(c *client.Client, ctx *gin.Context, log *slog.Logger) ([]byte, error) {
+	data, err := ctx.GetRawData()
+	if err != nil {
+		return nil, fmt.Errorf("failed to read request body: %w", err)
+	}
 	req, err := validator.Machine(data, log)
 	if err != nil {
 		return nil, err
@@ -90,7 +88,11 @@ func processMachineCreate(c *client.Client, data []byte, log *slog.Logger) ([]by
 	return resp, nil
 }
 
-func processTaskCreate(c *client.Client, data []byte, log *slog.Logger) ([]byte, error) {
+func processTaskCreate(c *client.Client, ctx *gin.Context, log *slog.Logger) ([]byte, error) {
+	data, err := ctx.GetRawData()
+	if err != nil {
+		return nil, fmt.Errorf("failed to read request body: %w", err)
+	}
 	req, err := validator.Task(data, log)
 	if err != nil {
 		return nil, err
@@ -106,7 +108,11 @@ func processTaskCreate(c *client.Client, data []byte, log *slog.Logger) ([]byte,
 	return resp, nil
 }
 
-func processUserCreate(c *client.Client, data []byte, log *slog.Logger) ([]byte, error) {
+func processUserCreate(c *client.Client, ctx *gin.Context, log *slog.Logger) ([]byte, error) {
+	data, err := ctx.GetRawData()
+	if err != nil {
+		return nil, fmt.Errorf("failed to read request body: %w", err)
+	}
 	req, err := validator.User(data, log)
 	if err != nil {
 		return nil, err
@@ -122,7 +128,11 @@ func processUserCreate(c *client.Client, data []byte, log *slog.Logger) ([]byte,
 	return resp, nil
 }
 
-func processShiftCreate(c *client.Client, data []byte, log *slog.Logger) ([]byte, error) {
+func processShiftCreate(c *client.Client, ctx *gin.Context, log *slog.Logger) ([]byte, error) {
+	data, err := ctx.GetRawData()
+	if err != nil {
+		return nil, fmt.Errorf("failed to read request body: %w", err)
+	}
 	req, err := validator.Shift(data, log)
 	if err != nil {
 		return nil, err

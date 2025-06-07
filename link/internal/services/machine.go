@@ -22,7 +22,7 @@ type createMachineParams struct {
 	IsActive         *bool  `json:"isactive,omitempty"`
 }
 
-func CreateMachine(data []byte, log *slog.Logger) ([]byte, error) {
+func CreateMachine(data []byte, log *slog.Logger, url string) ([]byte, error) {
 	log.Info("Start processing machine creation request")
 
 	machine, err := marshalCreateMachine(data, log)
