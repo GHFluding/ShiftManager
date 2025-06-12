@@ -20,15 +20,13 @@ type ViewFunc func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Up
 
 func New(api *tgbotapi.BotAPI, log *slog.Logger) *Bot {
 	return &Bot{
-		api: api,
-		log: log,
+		api:      api,
+		log:      log,
+		cmdViews: make(map[string]ViewFunc),
 	}
 }
 
 func (b *Bot) RegisterCmdView(cmd string, view ViewFunc) {
-	if b.cmdViews == nil {
-		b.cmdViews = make(map[string]ViewFunc)
-	}
 	b.cmdViews[cmd] = view
 }
 
