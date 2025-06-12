@@ -33,8 +33,6 @@ func (b *Bot) RegisterCmdView(cmd string, view ViewFunc) {
 }
 
 func (b *Bot) handleUpdate(ctx context.Context, update tgbotapi.Update) {
-	const op = "bot.handleUpdate"
-	b.log.With("op:", op)
 	defer func() {
 		if p := recover(); p != nil {
 			b.log.Info("panic recovered %v\n%s", p, slog.String("error: ", string(debug.Stack())))
@@ -52,8 +50,7 @@ func (b *Bot) handleUpdate(ctx context.Context, update tgbotapi.Update) {
 		return
 	}
 
-	view := cmdView
-	if err := view(ctx, b.api, update); err != nil {
+	if err := cmdView(ctx, b.api, update); err != nil {
 		b.log.Info("bot command: %s, is failed", cmd, " \n with Error: ", sl.Err(err))
 
 		if _, err := b.api.Send(
@@ -65,8 +62,6 @@ func (b *Bot) handleUpdate(ctx context.Context, update tgbotapi.Update) {
 	}
 }
 func (b *Bot) Run(ctx context.Context) error {
-	const op = "bot.run"
-	b.log.With("op:", op)
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
