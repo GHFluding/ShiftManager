@@ -18,4 +18,6 @@ WHERE id = @id;
 -- name: DeleteMachine :exec
 DELETE FROM Machine
 WHERE id = @id;
-
+-- name: GetMachine :one
+SELECT * FROM Machine
+WHERE id = $1;

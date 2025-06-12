@@ -1,8 +1,9 @@
 package handler_utils
 
 import (
-	"sm/internal/transport/middleware"
 	"time"
+
+	"github.com/GHFluding/ShiftManager/SM/internal/transport/middleware"
 
 	"github.com/gin-gonic/gin"
 )

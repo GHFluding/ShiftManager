@@ -1,4 +1,4 @@
-module linkSM
+module github.com/GHFluding/ShiftManager/link
 
 go 1.23.4
 

@@ -3,10 +3,11 @@ package handler
 import (
 	"errors"
 	"log/slog"
-	"sm/internal/services"
-	"sm/internal/utils/handler_utils"
-	"sm/internal/utils/logger"
 	"strconv"
+
+	"github.com/GHFluding/ShiftManager/SM/internal/services"
+	"github.com/GHFluding/ShiftManager/SM/internal/utils/handler_utils"
+	"github.com/GHFluding/ShiftManager/SM/internal/utils/logger"
 
 	"github.com/gin-gonic/gin"
 )

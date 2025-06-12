@@ -2,7 +2,8 @@ package services
 
 import (
 	"context"
-	"sm/internal/database/postgres"
+
+	"github.com/GHFluding/ShiftManager/SM/internal/database/postgres"
 )
 
 func DeleteShiftTask(sp *ServicesParams, reqTaskID int64, reqShiftId int64) error {

@@ -1,8 +1,8 @@
 package main
 
 import (
-	_ "sm/docs"
-	shiftManager "sm/internal/app/SM"
+	_ "github.com/GHFluding/ShiftManager/SM/docs"
+	shiftManager "github.com/GHFluding/ShiftManager/SM/internal/app/SM"
 )
 
 // @title           Shift manager api

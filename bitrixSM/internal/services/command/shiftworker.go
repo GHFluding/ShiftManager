@@ -1,9 +1,10 @@
 package bot_command
 
 import (
-	config "bsm/internal/config/loadconfig"
-	logger "bsm/internal/utils"
 	"log/slog"
+
+	config "github.com/GHFluding/ShiftManager/bitrixSM/internal/config/loadconfig"
+	logger "github.com/GHFluding/ShiftManager/bitrixSM/internal/utils"
 )
 
 func AddShiftWorker(baseURL string, args []string, log *slog.Logger) (string, error) {

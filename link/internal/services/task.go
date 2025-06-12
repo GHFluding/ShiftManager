@@ -2,14 +2,18 @@ package services
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"time"
 
-	logger "linkSM/internal/utils"
 	"log/slog"
+
+	"github.com/GHFluding/ShiftManager/SMgrpc/pkg/client"
+	entities "github.com/GHFluding/ShiftManager/SMgrpc/pkg/gen"
+	logger "github.com/GHFluding/ShiftManager/link/internal/utils"
 )
 
 type createTaskParams struct {
@@ -61,6 +65,18 @@ func CreateTask(data []byte, log *slog.Logger, url string) ([]byte, error) {
 		slog.Int("status", resp.StatusCode))
 
 	return responseData, nil
+}
+
+func CreateTaskGRPC(c *client.Client, data *entities.CreateTaskParams, log *slog.Logger) (*entities.TaskResponse, error) {
+	log.Info("Start processing task creation request")
+
+	resp, err := c.CreateTask(context.Background(), data)
+	if err != nil {
+		log.Error("GRPC request failed", logger.ErrToAttr(err))
+		return nil, fmt.Errorf("service unavailable: %w", err)
+	}
+
+	return resp, nil
 }
 
 func marshalCreateTask(data []byte, log *slog.Logger) (createTaskParams, error) {

@@ -1,4 +1,4 @@
-module smgrpc
+module github.com/GHFluding/ShiftManager/SMgrpc
 
 go 1.23.4
 

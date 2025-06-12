@@ -70,6 +70,35 @@ func (q *Queries) DeleteTask(ctx context.Context, id int64) error {
 	return err
 }
 
+const getTask = `-- name: GetTask :one
+SELECT id, machineid, shiftid, frequency, taskpriority, description, createdby, createdat, verifiedby, verifiedat, completedby, completedat, status, comment, movedinprogressby, movedinprogressat FROM Tasks
+WHERE id = $1
+`
+
+func (q *Queries) GetTask(ctx context.Context, id int64) (Task, error) {
+	row := q.db.QueryRow(ctx, getTask, id)
+	var i Task
+	err := row.Scan(
+		&i.ID,
+		&i.Machineid,
+		&i.Shiftid,
+		&i.Frequency,
+		&i.Taskpriority,
+		&i.Description,
+		&i.Createdby,
+		&i.Createdat,
+		&i.Verifiedby,
+		&i.Verifiedat,
+		&i.Completedby,
+		&i.Completedat,
+		&i.Status,
+		&i.Comment,
+		&i.Movedinprogressby,
+		&i.Movedinprogressat,
+	)
+	return i, err
+}
+
 const setTaskStatusCompleted = `-- name: SetTaskStatusCompleted :exec
 UPDATE Tasks
 SET 

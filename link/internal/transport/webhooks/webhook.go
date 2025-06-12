@@ -1,10 +1,11 @@
 package webhooks
 
 import (
-	"linkSM/internal/services"
-	logger "linkSM/internal/utils"
 	"log/slog"
 	"net/http"
+
+	"github.com/GHFluding/ShiftManager/link/internal/services"
+	logger "github.com/GHFluding/ShiftManager/link/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )

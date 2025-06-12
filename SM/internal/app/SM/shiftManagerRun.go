@@ -2,13 +2,14 @@ package shiftManager
 
 import (
 	"fmt"
-	"sm/internal/config"
-	"sm/internal/database"
-	"sm/internal/database/postgres"
-	"sm/internal/services"
-	"sm/internal/transport/handler"
-	"sm/internal/transport/middleware"
-	"sm/internal/utils/logger"
+
+	"github.com/GHFluding/ShiftManager/SM/internal/config"
+	"github.com/GHFluding/ShiftManager/SM/internal/database"
+	"github.com/GHFluding/ShiftManager/SM/internal/database/postgres"
+	"github.com/GHFluding/ShiftManager/SM/internal/services"
+	"github.com/GHFluding/ShiftManager/SM/internal/transport/handler"
+	"github.com/GHFluding/ShiftManager/SM/internal/transport/middleware"
+	"github.com/GHFluding/ShiftManager/SM/internal/utils/logger"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-migrate/migrate/v4"

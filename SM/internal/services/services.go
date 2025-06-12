@@ -2,7 +2,8 @@ package services
 
 import (
 	"log/slog"
-	"sm/internal/database/postgres"
+
+	"github.com/GHFluding/ShiftManager/SM/internal/database/postgres"
 )
 
 type ServicesParams struct {

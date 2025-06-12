@@ -7,6 +7,8 @@ package postgres
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const changeUserRole = `-- name: ChangeUserRole :exec
@@ -26,43 +28,28 @@ func (q *Queries) ChangeUserRole(ctx context.Context, arg ChangeUserRoleParams) 
 	return err
 }
 
-const checkUserRole = `-- name: CheckUserRole :one
-SELECT id, bitrixid, name, role FROM Users
-WHERE id = $1
-`
-
-func (q *Queries) CheckUserRole(ctx context.Context, id int64) (User, error) {
-	row := q.db.QueryRow(ctx, checkUserRole, id)
-	var i User
-	err := row.Scan(
-		&i.ID,
-		&i.Bitrixid,
-		&i.Name,
-		&i.Role,
-	)
-	return i, err
-}
-
 const createUser = `-- name: CreateUser :one
 INSERT INTO Users(
-    id, bitrixid, name, role 
+    id, bitrixid,telegramid, name, role 
 ) VALUES (
-    $1, $2, $3, $4
+    $1, $2,$3, $4, $5
 )
-RETURNING id, bitrixid, name, role
+RETURNING id, bitrixid, telegramid, name, role
 `
 
 type CreateUserParams struct {
-	ID       int64
-	Bitrixid int64
-	Name     string
-	Role     Userrole
+	ID         int64
+	Bitrixid   pgtype.Int8
+	Telegramid string
+	Name       string
+	Role       Userrole
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
 	row := q.db.QueryRow(ctx, createUser,
 		arg.ID,
 		arg.Bitrixid,
+		arg.Telegramid,
 		arg.Name,
 		arg.Role,
 	)
@@ -70,6 +57,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	err := row.Scan(
 		&i.ID,
 		&i.Bitrixid,
+		&i.Telegramid,
 		&i.Name,
 		&i.Role,
 	)
@@ -86,8 +74,26 @@ func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
 	return err
 }
 
+const getUser = `-- name: GetUser :one
+SELECT id, bitrixid, telegramid, name, role FROM Users
+WHERE id = $1
+`
+
+func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
+	row := q.db.QueryRow(ctx, getUser, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Bitrixid,
+		&i.Telegramid,
+		&i.Name,
+		&i.Role,
+	)
+	return i, err
+}
+
 const usersList = `-- name: UsersList :many
-Select id, bitrixid, name, role FROM Users
+Select id, bitrixid, telegramid, name, role FROM Users
 ORDER BY id
 `
 
@@ -103,6 +109,7 @@ func (q *Queries) UsersList(ctx context.Context) ([]User, error) {
 		if err := rows.Scan(
 			&i.ID,
 			&i.Bitrixid,
+			&i.Telegramid,
 			&i.Name,
 			&i.Role,
 		); err != nil {
@@ -117,7 +124,7 @@ func (q *Queries) UsersList(ctx context.Context) ([]User, error) {
 }
 
 const usersListByRole = `-- name: UsersListByRole :many
-Select id, bitrixid, name, role FROM Users
+Select id, bitrixid, telegramid, name, role FROM Users
 WHERE role = $1
 ORDER BY id
 `
@@ -134,6 +141,7 @@ func (q *Queries) UsersListByRole(ctx context.Context, role Userrole) ([]User, e
 		if err := rows.Scan(
 			&i.ID,
 			&i.Bitrixid,
+			&i.Telegramid,
 			&i.Name,
 			&i.Role,
 		); err != nil {

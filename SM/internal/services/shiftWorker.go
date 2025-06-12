@@ -2,8 +2,9 @@ package services
 
 import (
 	"context"
-	"sm/internal/database/postgres"
-	"sm/internal/utils/logger"
+
+	"github.com/GHFluding/ShiftManager/SM/internal/database/postgres"
+	"github.com/GHFluding/ShiftManager/SM/internal/utils/logger"
 )
 
 func AddShiftWorker(sp *ServicesParams, req ShiftWorker) (ShiftWorker, error) {
