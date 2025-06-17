@@ -17,6 +17,8 @@ type User struct {
 	Role       string   `json:"role"`
 }
 
+const emptyString = ""
+
 type UserData struct {
 	Name   string `json:"name"`
 	BtrxID string `json:"btrx_id"`
@@ -43,13 +45,13 @@ func StartHandler(userService UserService) model.ViewFunc {
 		if err != nil {
 			user = &User{TelegramID: userID}
 		}
-		if user.Data.Name == "" {
+		if user.Data.Name == emptyString {
 			handler := NameHandler(userService)
 			if err := handler(ctx, bot, update); err != nil {
 				return err
 			}
 		}
-		if user.Data.BtrxID == "" {
+		if user.Data.BtrxID == emptyString {
 			handler := BitrixHandler(userService)
 			if err := handler(ctx, bot, update); err != nil {
 				return err
