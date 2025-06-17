@@ -3,7 +3,6 @@ package commands
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"strings"
 	"telegramSM/internal/telegramapi/model"
 
@@ -28,11 +27,6 @@ type UserData struct {
 type UserService interface {
 	GetUser(ctx context.Context, telegramID int) (*User, error)
 	SaveUser(ctx context.Context, user *User) error
-}
-
-type RestUserService struct {
-	baseURL string
-	client  *http.Client
 }
 
 // StartHandler
