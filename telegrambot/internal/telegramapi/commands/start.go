@@ -39,13 +39,15 @@ func StartHandler(userService UserService) model.ViewFunc {
 		if err != nil {
 			user = &User{TelegramID: userID}
 		}
-		if user.Data.Name == emptyString {
+		isNameExist := user.Data.Name == emptyString
+		if isNameExist {
 			handler := NameHandler(userService)
 			if err := handler(ctx, bot, update); err != nil {
 				return err
 			}
 		}
-		if user.Data.BtrxID == emptyString {
+		isBitrixIdExist := user.Data.BtrxID == emptyString
+		if isBitrixIdExist {
 			handler := BitrixHandler(userService)
 			if err := handler(ctx, bot, update); err != nil {
 				return err
