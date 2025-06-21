@@ -17,6 +17,7 @@ type User struct {
 }
 
 const emptyString = ""
+const emptyInt = 0
 
 type UserData struct {
 	Name   string `json:"name"`

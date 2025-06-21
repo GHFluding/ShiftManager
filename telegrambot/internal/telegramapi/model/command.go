@@ -1,23 +1,39 @@
 package model
 
-type Command string
+type CommandType string
 
 const (
-	CmdStart        Command = "/start"
-	CmdHelp         Command = "/help"
-	CmdTaskComplete Command = "/task-complete"
+	CmdStart      CommandType = "start"
+	CmdHelp       CommandType = "help"
+	CmdCreateTask CommandType = "createtask"
 )
 
-func GetDescription(command Command) string {
-	switch command {
-	case CmdStart:
-		return "команда для авторизации, либо регестрации"
-	case CmdTaskComplete:
-		return "Команда отмечает задание как сделанное"
-	}
-	return "неизвестная команда"
+type CommandMeta struct {
+	Type        CommandType
+	Description string
+	MinRole     string
 }
 
-var AdminCommands = [3]Command{CmdStart,
-	CmdHelp,
-	CmdTaskComplete}
+var (
+	AdminCommands = []CommandMeta{
+		{CmdStart, "Начало работы", "admin"},
+		{CmdHelp, "Помощь", "admin"},
+		{CmdCreateTask, "Создать задачу", "admin"},
+	}
+
+	MasterCommands = []CommandMeta{
+		{CmdStart, "Начало работы", "admin"},
+		{CmdHelp, "Помощь", "admin"},
+		{CmdCreateTask, "Создать задачу", "admin"},
+	}
+	ManagerCommands = []CommandMeta{
+		{CmdStart, "Начало работы", "admin"},
+		{CmdHelp, "Помощь", "admin"},
+		{CmdCreateTask, "Создать задачу", "admin"},
+	}
+	WorkerCommands = []CommandMeta{
+		{CmdStart, "Начало работы", "admin"},
+		{CmdHelp, "Помощь", "admin"},
+		{CmdCreateTask, "Создать задачу", "admin"},
+	}
+)
