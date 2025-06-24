@@ -23,7 +23,7 @@ type TaskService interface {
 	SaveTask(ctx context.Context, task *Task) error
 }
 
-func CreateTaskHandler(taskSvc TaskService) model.ViewFunc {
+func CreateTaskHandler(taskService TaskService) model.ViewFunc {
 	return func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update) error {
 		text := update.Message.Text
 		chatID := update.Message.Chat.ID
@@ -42,7 +42,7 @@ func CreateTaskHandler(taskSvc TaskService) model.ViewFunc {
 			return err
 		}
 
-		if err := taskSvc.SaveTask(ctx, task); err != nil {
+		if err := taskService.SaveTask(ctx, task); err != nil {
 			errorMsg := fmt.Sprintf("❌ Ошибка сохранения задачи: %v", err)
 			msg := tgbotapi.NewMessage(chatID, errorMsg)
 			_, err = bot.Send(msg)

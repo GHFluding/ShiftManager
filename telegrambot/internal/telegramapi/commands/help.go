@@ -8,12 +8,12 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-func HelpHandler(userSrv UserService) model.ViewFunc {
+func HelpHandler(userService UserService) model.ViewFunc {
 	return func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update) error {
 		chatID := update.Message.Chat.ID
 		userID := update.Message.From.ID
 
-		user, err := userSrv.GetUser(ctx, userID)
+		user, err := userService.GetUser(ctx, userID)
 		if err != nil {
 			msg := tgbotapi.NewMessage(chatID, "Ошибка получения данных пользователя")
 			_, _ = bot.Send(msg)

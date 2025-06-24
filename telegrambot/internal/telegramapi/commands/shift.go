@@ -68,7 +68,7 @@ const (
 )
 
 func CreateShiftHandler(
-	shiftSvc ShiftService,
+	shiftService ShiftService,
 	machineService MachineIconService,
 	masterService MasterIconService,
 ) model.ViewFunc {
@@ -226,7 +226,7 @@ func showMasterSelection(
 }
 
 func ShiftCallbackHandler(
-	shiftSvc ShiftService,
+	shiftService ShiftService,
 	machineService MachineIconService,
 	masterService MasterIconService,
 ) model.ViewFunc {
@@ -253,7 +253,7 @@ func ShiftCallbackHandler(
 			return handleMachineCallback(ctx, bot, callback, state, machineService, masterService, chatID)
 
 		case strings.HasPrefix(data, callbackMasterPrefix) && currentStep == stateMaster:
-			return handleMasterCallback(ctx, bot, callback, state, shiftSvc, chatID, int64(userID))
+			return handleMasterCallback(ctx, bot, callback, state, shiftService, chatID, int64(userID))
 		}
 
 		return nil
