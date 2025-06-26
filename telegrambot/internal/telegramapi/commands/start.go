@@ -6,7 +6,7 @@ import (
 	"strings"
 	"telegramSM/internal/telegramapi/model"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tgBotAPI "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 // User, UserData и Role
@@ -32,7 +32,7 @@ type UserService interface {
 
 // StartHandler
 func StartHandler(userService UserService) model.ViewFunc {
-	return func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update) error {
+	return func(ctx context.Context, bot *tgBotAPI.BotAPI, update tgBotAPI.Update) error {
 		userID := update.Message.From.ID
 		chatID := update.Message.Chat.ID
 
@@ -54,7 +54,7 @@ func StartHandler(userService UserService) model.ViewFunc {
 				return err
 			}
 		}
-		msg := tgbotapi.NewMessage(chatID, fmt.Sprintf(
+		msg := tgBotAPI.NewMessage(chatID, fmt.Sprintf(
 			"👋 Добро пожаловать, %s!\n\n "+string(model.CmdHelp)+" для списка команд.",
 			user.Data.Name,
 		))
@@ -64,7 +64,7 @@ func StartHandler(userService UserService) model.ViewFunc {
 }
 
 func NameHandler(userService UserService) model.ViewFunc {
-	return func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update) error {
+	return func(ctx context.Context, bot *tgBotAPI.BotAPI, update tgBotAPI.Update) error {
 		userID := update.Message.From.ID
 		chatID := update.Message.Chat.ID
 		name := strings.TrimSpace(update.Message.Text)
@@ -75,7 +75,7 @@ func NameHandler(userService UserService) model.ViewFunc {
 		}
 
 		if len(name) < 5 || !strings.Contains(name, " ") {
-			msg := tgbotapi.NewMessage(chatID, "❌ Неверный формат ФИО. Введите полное имя:")
+			msg := tgBotAPI.NewMessage(chatID, "❌ Неверный формат ФИО. Введите полное имя:")
 			_, _ = bot.Send(msg)
 			return nil
 		}
@@ -83,14 +83,14 @@ func NameHandler(userService UserService) model.ViewFunc {
 		user.Data.Name = name
 		_ = userService.SaveUser(ctx, user)
 
-		msg := tgbotapi.NewMessage(chatID, "✅ ФИО сохранено! Теперь введите ваш Bitrix24 ID (или 'нет'):")
+		msg := tgBotAPI.NewMessage(chatID, "✅ ФИО сохранено! Теперь введите ваш Bitrix24 ID (или 'нет'):")
 		_, err = bot.Send(msg)
 		return err
 	}
 }
 
 func BitrixHandler(userService UserService) model.ViewFunc {
-	return func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update) error {
+	return func(ctx context.Context, bot *tgBotAPI.BotAPI, update tgBotAPI.Update) error {
 		userID := update.Message.From.ID
 		chatID := update.Message.Chat.ID
 		input := strings.TrimSpace(update.Message.Text)
@@ -111,7 +111,7 @@ func BitrixHandler(userService UserService) model.ViewFunc {
 			confirmation += fmt.Sprintf("\n Bitrix24 ID: %s", user.Data.BtrxID)
 		}
 		confirmation += "\n\nТеперь вам доступны все функции бота."
-		msg := tgbotapi.NewMessage(chatID, confirmation)
+		msg := tgBotAPI.NewMessage(chatID, confirmation)
 		_, err = bot.Send(msg)
 		return err
 	}

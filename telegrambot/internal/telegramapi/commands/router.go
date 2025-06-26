@@ -4,7 +4,7 @@ import (
 	"context"
 	"telegramSM/internal/telegramapi/model"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tgBotAPI "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 type Router struct {
@@ -27,7 +27,7 @@ func (r *Router) RegisterMessageHandler(handler model.ViewFunc) {
 	r.messageHandlers = append(r.messageHandlers, handler)
 }
 
-func (r *Router) HandleUpdate(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update) error {
+func (r *Router) HandleUpdate(ctx context.Context, bot *tgBotAPI.BotAPI, update tgBotAPI.Update) error {
 	if update.Message != nil && update.Message.IsCommand() {
 		cmd := model.CommandType(update.Message.Command())
 		if handler, exists := r.commandHandlers[cmd]; exists {

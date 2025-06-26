@@ -6,7 +6,7 @@ import (
 	"strings"
 	"telegramSM/internal/telegramapi/model"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tgBotAPI "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 type Task struct {
@@ -24,14 +24,14 @@ type TaskService interface {
 }
 
 func CreateTaskHandler(taskService TaskService) model.ViewFunc {
-	return func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update) error {
+	return func(ctx context.Context, bot *tgBotAPI.BotAPI, update tgBotAPI.Update) error {
 		text := update.Message.Text
 		chatID := update.Message.Chat.ID
 		userID := int64(update.Message.From.ID)
 
 		task, err := parseTaskInput(text, userID)
 		if err != nil {
-			msg := tgbotapi.NewMessage(chatID,
+			msg := tgBotAPI.NewMessage(chatID,
 				"❌ Неверный формат задачи. Используйте:\n"+
 					"Машина: [ID]\n"+
 					"Смена: [ID]\n"+
@@ -44,7 +44,7 @@ func CreateTaskHandler(taskService TaskService) model.ViewFunc {
 
 		if err := taskService.SaveTask(ctx, task); err != nil {
 			errorMsg := fmt.Sprintf("❌ Ошибка сохранения задачи: %v", err)
-			msg := tgbotapi.NewMessage(chatID, errorMsg)
+			msg := tgBotAPI.NewMessage(chatID, errorMsg)
 			_, err = bot.Send(msg)
 			return err
 		}
@@ -63,7 +63,7 @@ func CreateTaskHandler(taskService TaskService) model.ViewFunc {
 			task.Description,
 		)
 
-		msg := tgbotapi.NewMessage(chatID, confirmation)
+		msg := tgBotAPI.NewMessage(chatID, confirmation)
 		_, err = bot.Send(msg)
 		return err
 	}

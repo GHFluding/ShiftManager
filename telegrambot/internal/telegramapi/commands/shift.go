@@ -7,7 +7,7 @@ import (
 	"strings"
 	"telegramSM/internal/telegramapi/model"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tgBotAPI "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 type Shift struct {
@@ -52,15 +52,14 @@ const (
 func (s *ShiftCreationState) CurrentStep() createShiftState {
 	if s.MachineID == emptyInt {
 		return stateMachine
-	} else {
-		if s.ShiftMasterID == emptyInt {
-			return stateMaster
-		}
+	}
+	if s.ShiftMasterID == emptyInt {
+		return stateMaster
 	}
 	return stateComplete
 }
 
-var shiftStates = make(map[int64]*ShiftCreationState)
+var shiftStates = make(map[int64]*ShiftCreationState) // @key: userID
 
 const (
 	callbackMachinePrefix = "machine_"
@@ -72,7 +71,7 @@ func CreateShiftHandler(
 	machineService MachineIconService,
 	masterService MasterIconService,
 ) model.ViewFunc {
-	return func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update) error {
+	return func(ctx context.Context, bot *tgBotAPI.BotAPI, update tgBotAPI.Update) error {
 		chatID := update.Message.Chat.ID
 		userID := update.Message.From.ID
 
@@ -90,13 +89,13 @@ func CreateShiftHandler(
 		case stateMaster:
 			return handleMasterStep(ctx, bot, update, state, masterService, chatID)
 		case stateComplete:
-			msg := tgbotapi.NewMessage(chatID,
+			msg := tgBotAPI.NewMessage(chatID,
 				"✅ Смена уже создана!\n"+
 					"Используйте /newshift для создания новой смены")
 			_, err := bot.Send(msg)
 			return err
 		default:
-			msg := tgbotapi.NewMessage(chatID,
+			msg := tgBotAPI.NewMessage(chatID,
 				"🚫 Неизвестное состояние. Начните заново с /createshift")
 			_, err := bot.Send(msg)
 			return err
@@ -106,20 +105,20 @@ func CreateShiftHandler(
 
 func handleMachineStep(
 	ctx context.Context,
-	bot *tgbotapi.BotAPI,
-	update tgbotapi.Update,
+	bot *tgBotAPI.BotAPI,
+	update tgBotAPI.Update,
 	state *ShiftCreationState,
 	machineService MachineIconService,
 	masterService MasterIconService,
 	chatID int64,
 ) error {
-	if update.Message.Text == "/createshift" {
+	if update.Message.Text == string("/"+model.CmdCreateShift) {
 		return showMachineSelection(ctx, bot, chatID, machineService)
 	}
 
 	machineID, err := strconv.ParseInt(update.Message.Text, 10, 64)
 	if err != nil {
-		msg := tgbotapi.NewMessage(chatID,
+		msg := tgBotAPI.NewMessage(chatID,
 			"❌ Неверный формат ID машины. Введите число или выберите из списка.")
 		_, err := bot.Send(msg)
 		return err
@@ -131,8 +130,8 @@ func handleMachineStep(
 
 func handleMasterStep(
 	ctx context.Context,
-	bot *tgbotapi.BotAPI,
-	update tgbotapi.Update,
+	bot *tgBotAPI.BotAPI,
+	update tgBotAPI.Update,
 	state *ShiftCreationState,
 	masterService MasterIconService,
 	chatID int64,
@@ -143,7 +142,7 @@ func handleMasterStep(
 
 	masterID, err := strconv.ParseInt(update.Message.Text, 10, 64)
 	if err != nil {
-		msg := tgbotapi.NewMessage(chatID,
+		msg := tgBotAPI.NewMessage(chatID,
 			"❌ Неверный формат ID мастера. Введите число или выберите из списка.")
 		_, err := bot.Send(msg)
 		return err
@@ -155,35 +154,34 @@ func handleMasterStep(
 
 func showMachineSelection(
 	ctx context.Context,
-	bot *tgbotapi.BotAPI,
+	bot *tgBotAPI.BotAPI,
 	chatID int64,
 	machineService MachineIconService,
 ) error {
 	machines, err := machineService.ListMachines(ctx)
 	if err != nil {
-		msg := tgbotapi.NewMessage(chatID, "❌ Ошибка получения списка машин")
+		msg := tgBotAPI.NewMessage(chatID, "❌ Ошибка получения списка машин")
 		_, err := bot.Send(msg)
 		return err
 	}
 
 	if len(machines) == 0 {
-		msg := tgbotapi.NewMessage(chatID, "Нет доступных машин")
+		msg := tgBotAPI.NewMessage(chatID, "Нет доступных машин")
 		_, err := bot.Send(msg)
 		return err
 	}
 
-	var rows []tgbotapi.InlineKeyboardButton
-	for _, machine := range machines {
-		btn := tgbotapi.NewInlineKeyboardButtonData(
-			fmt.Sprintf("%s (ID: %d)", machine.Name, machine.ID),
-			callbackMachinePrefix+strconv.FormatInt(machine.ID, 10),
-		)
-		rows = append(rows, btn)
-	}
+	keyboard := createInlineKeyboard(
+		machines,
+		func(m MachineIcon) string {
+			return fmt.Sprintf("%s (ID: %d)", m.Name, m.ID)
+		},
+		func(m MachineIcon) string {
+			return callbackMachinePrefix + strconv.FormatInt(m.ID, 10)
+		},
+	)
 
-	keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(rows...))
-
-	msg := tgbotapi.NewMessage(chatID, "Выберите машину:")
+	msg := tgBotAPI.NewMessage(chatID, "Выберите машину:")
 	msg.ReplyMarkup = keyboard
 	_, err = bot.Send(msg)
 	return err
@@ -191,35 +189,34 @@ func showMachineSelection(
 
 func showMasterSelection(
 	ctx context.Context,
-	bot *tgbotapi.BotAPI,
+	bot *tgBotAPI.BotAPI,
 	chatID int64,
 	masterService MasterIconService,
 ) error {
 	masters, err := masterService.ListMasters(ctx)
 	if err != nil {
-		msg := tgbotapi.NewMessage(chatID, "❌ Ошибка получения списка мастеров")
+		msg := tgBotAPI.NewMessage(chatID, "❌ Ошибка получения списка мастеров")
 		_, err := bot.Send(msg)
 		return err
 	}
 
 	if len(masters) == 0 {
-		msg := tgbotapi.NewMessage(chatID, "Нет доступных мастеров")
+		msg := tgBotAPI.NewMessage(chatID, "Нет доступных мастеров")
 		_, err := bot.Send(msg)
 		return err
 	}
 
-	var rows []tgbotapi.InlineKeyboardButton
-	for _, master := range masters {
-		btn := tgbotapi.NewInlineKeyboardButtonData(
-			fmt.Sprintf("%s (ID: %d)", master.Name, master.ID),
-			callbackMasterPrefix+strconv.FormatInt(master.ID, 10),
-		)
-		rows = append(rows, btn)
-	}
+	keyboard := createInlineKeyboard(
+		masters,
+		func(m MasterIcon) string {
+			return fmt.Sprintf("%s (ID: %d)", m.Name, m.ID)
+		},
+		func(m MasterIcon) string {
+			return callbackMasterPrefix + strconv.FormatInt(m.ID, 10)
+		},
+	)
 
-	keyboard := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(rows...))
-
-	msg := tgbotapi.NewMessage(chatID, "Выберите мастера смены:")
+	msg := tgBotAPI.NewMessage(chatID, "Выберите мастера смены:")
 	msg.ReplyMarkup = keyboard
 	_, err = bot.Send(msg)
 	return err
@@ -230,7 +227,7 @@ func ShiftCallbackHandler(
 	machineService MachineIconService,
 	masterService MasterIconService,
 ) model.ViewFunc {
-	return func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update) error {
+	return func(ctx context.Context, bot *tgBotAPI.BotAPI, update tgBotAPI.Update) error {
 		callback := update.CallbackQuery
 		if callback == nil {
 			return nil
@@ -262,8 +259,8 @@ func ShiftCallbackHandler(
 
 func handleMachineCallback(
 	ctx context.Context,
-	bot *tgbotapi.BotAPI,
-	callback *tgbotapi.CallbackQuery,
+	bot *tgBotAPI.BotAPI,
+	callback *tgBotAPI.CallbackQuery,
 	state *ShiftCreationState,
 	machineService MachineIconService,
 	masterService MasterIconService,
@@ -277,7 +274,7 @@ func handleMachineCallback(
 
 	state.MachineID = machineID
 
-	edit := tgbotapi.NewEditMessageText(
+	edit := tgBotAPI.NewEditMessageText(
 		chatID,
 		callback.Message.MessageID,
 		"✅ Машина выбрана: "+getButtonText(callback.Message),
@@ -289,8 +286,8 @@ func handleMachineCallback(
 
 func handleMasterCallback(
 	ctx context.Context,
-	bot *tgbotapi.BotAPI,
-	callback *tgbotapi.CallbackQuery,
+	bot *tgBotAPI.BotAPI,
+	callback *tgBotAPI.CallbackQuery,
 	state *ShiftCreationState,
 	shiftSvc ShiftService,
 	chatID int64,
@@ -304,7 +301,7 @@ func handleMasterCallback(
 
 	state.ShiftMasterID = masterID
 
-	edit := tgbotapi.NewEditMessageText(
+	edit := tgBotAPI.NewEditMessageText(
 		chatID,
 		callback.Message.MessageID,
 		"✅ Мастер выбран: "+getButtonText(callback.Message),
@@ -318,7 +315,7 @@ func handleMasterCallback(
 
 	if err := shiftSvc.SaveShift(ctx, shift); err != nil {
 		errorMsg := fmt.Sprintf("❌ Ошибка сохранения смены: %v", err)
-		msg := tgbotapi.NewMessage(chatID, errorMsg)
+		msg := tgBotAPI.NewMessage(chatID, errorMsg)
 		bot.Send(msg)
 		return err
 	}
@@ -331,14 +328,14 @@ func handleMasterCallback(
 		shift.ShiftMasterID,
 	)
 
-	msg := tgbotapi.NewMessage(chatID, confirmation)
+	msg := tgBotAPI.NewMessage(chatID, confirmation)
 	bot.Send(msg)
 
 	delete(shiftStates, userID)
 	return nil
 }
 
-func getButtonText(msg *tgbotapi.Message) string {
+func getButtonText(msg *tgBotAPI.Message) string {
 	if msg == nil {
 		return ""
 	}

@@ -7,18 +7,18 @@ import (
 	sl "telegramSM/internal/util/logger"
 	"time"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tgBotAPI "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 type Bot struct {
-	api      *tgbotapi.BotAPI
+	api      *tgBotAPI.BotAPI
 	cmdViews map[string]ViewFunc
 	log      *slog.Logger
 }
 
-type ViewFunc func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update) error
+type ViewFunc func(ctx context.Context, bot *tgBotAPI.BotAPI, update tgBotAPI.Update) error
 
-func New(api *tgbotapi.BotAPI, log *slog.Logger) *Bot {
+func New(api *tgBotAPI.BotAPI, log *slog.Logger) *Bot {
 	return &Bot{
 		api:      api,
 		log:      log,
@@ -30,7 +30,7 @@ func (b *Bot) RegisterCmdView(cmd string, view ViewFunc) {
 	b.cmdViews[cmd] = view
 }
 
-func (b *Bot) handleUpdate(ctx context.Context, update tgbotapi.Update) {
+func (b *Bot) handleUpdate(ctx context.Context, update tgBotAPI.Update) {
 	defer func() {
 		if p := recover(); p != nil {
 			b.log.Info("panic recovered %v\n%s", p, slog.String("error: ", string(debug.Stack())))
@@ -52,7 +52,7 @@ func (b *Bot) handleUpdate(ctx context.Context, update tgbotapi.Update) {
 		b.log.Info("bot command: %s, is failed", cmd, " \n with Error: ", sl.Err(err))
 
 		if _, err := b.api.Send(
-			tgbotapi.NewMessage(update.Message.Chat.ID, "internal error"),
+			tgBotAPI.NewMessage(update.Message.Chat.ID, "internal error"),
 		); err != nil {
 			b.log.Info("Failed error info message", sl.Err(err))
 		}
@@ -60,7 +60,7 @@ func (b *Bot) handleUpdate(ctx context.Context, update tgbotapi.Update) {
 	}
 }
 func (b *Bot) Run(ctx context.Context) error {
-	u := tgbotapi.NewUpdate(0)
+	u := tgBotAPI.NewUpdate(0)
 	u.Timeout = 60
 
 	updates, err := b.api.GetUpdatesChan(u)

@@ -5,17 +5,17 @@ import (
 	"fmt"
 	"telegramSM/internal/telegramapi/model"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tgBotAPI "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 func HelpHandler(userService UserService) model.ViewFunc {
-	return func(ctx context.Context, bot *tgbotapi.BotAPI, update tgbotapi.Update) error {
+	return func(ctx context.Context, bot *tgBotAPI.BotAPI, update tgBotAPI.Update) error {
 		chatID := update.Message.Chat.ID
 		userID := update.Message.From.ID
 
 		user, err := userService.GetUser(ctx, userID)
 		if err != nil {
-			msg := tgbotapi.NewMessage(chatID, "Ошибка получения данных пользователя")
+			msg := tgBotAPI.NewMessage(chatID, "Ошибка получения данных пользователя")
 			_, _ = bot.Send(msg)
 			return err
 		}
@@ -31,7 +31,7 @@ func HelpHandler(userService UserService) model.ViewFunc {
 		case model.RoleWorker:
 			commands = model.WorkerCommands
 		default:
-			msg := tgbotapi.NewMessage(chatID, "Вначале пройдите регистрацию: /start")
+			msg := tgBotAPI.NewMessage(chatID, "Вначале пройдите регистрацию: /start")
 			_, err = bot.Send(msg)
 		}
 		messageText := "Доступные команды:\n\n"
@@ -39,7 +39,7 @@ func HelpHandler(userService UserService) model.ViewFunc {
 			messageText += fmt.Sprintf("/%s - %s\n", cmd.Type, cmd.Description)
 		}
 
-		msg := tgbotapi.NewMessage(chatID, messageText)
+		msg := tgBotAPI.NewMessage(chatID, messageText)
 		_, err = bot.Send(msg)
 		return err
 	}
