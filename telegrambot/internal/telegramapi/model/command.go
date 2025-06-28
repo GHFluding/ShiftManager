@@ -3,9 +3,10 @@ package model
 type CommandType string
 
 const (
-	CmdStart      CommandType = "start"
-	CmdHelp       CommandType = "help"
-	CmdCreateTask CommandType = "createtask"
+	CmdStart       CommandType = "start"
+	CmdHelp        CommandType = "help"
+	CmdCreateTask  CommandType = "createtask"
+	CmdCreateShift CommandType = "createshift"
 )
 
 type CommandMeta struct {

@@ -6,7 +6,6 @@ import (
 
 func createInlineKeyboard[T any](
 	items []T,
-	prefix string,
 	textFunc func(item T) string,
 	callBackFunc func(item T) string,
 ) tgBotAPI.InlineKeyboardMarkup {

@@ -3,11 +3,21 @@ package commands
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"strings"
 	"telegramSM/internal/telegramapi/model"
 
 	tgBotAPI "github.com/go-telegram-bot-api/telegram-bot-api"
 )
+
+type MachineService interface {
+	ListMachines(ctx context.Context) ([]Machine, error)
+}
+
+type Machine struct {
+	ID   int64
+	Name string
+}
 
 type Task struct {
 	Machineid    int64
@@ -23,89 +33,100 @@ type TaskService interface {
 	SaveTask(ctx context.Context, task *Task) error
 }
 
-func CreateTaskHandler(taskService TaskService) model.ViewFunc {
+func CreateTaskHandler(taskService TaskService, machineService MachineService, shiftService ShiftService) model.ViewFunc {
 	return func(ctx context.Context, bot *tgBotAPI.BotAPI, update tgBotAPI.Update) error {
-		text := update.Message.Text
 		chatID := update.Message.Chat.ID
-		userID := int64(update.Message.From.ID)
 
-		task, err := parseTaskInput(text, userID)
-		if err != nil {
-			msg := tgBotAPI.NewMessage(chatID,
-				"❌ Неверный формат задачи. Используйте:\n"+
-					"Машина: [ID]\n"+
-					"Смена: [ID]\n"+
-					"Частота: [частота]\n"+
-					"Приоритет: [приоритет]\n"+
-					"Описание: [текст]")
-			_, err = bot.Send(msg)
-			return err
-		}
-
-		if err := taskService.SaveTask(ctx, task); err != nil {
-			errorMsg := fmt.Sprintf("❌ Ошибка сохранения задачи: %v", err)
-			msg := tgBotAPI.NewMessage(chatID, errorMsg)
-			_, err = bot.Send(msg)
-			return err
-		}
-
-		confirmation := fmt.Sprintf(
-			"✅ Задача создана!\n\n"+
-				"Машина: %d\n"+
-				"Смена: %d\n"+
-				"Частота: %s\n"+
-				"Приоритет: %s\n"+
-				"Описание: %s",
-			task.Machineid,
-			task.Shiftid,
-			task.Frequency,
-			task.Taskpriority,
-			task.Description,
-		)
-
-		msg := tgBotAPI.NewMessage(chatID, confirmation)
-		_, err = bot.Send(msg)
-		return err
+		return showTaskMachineSelection(ctx, bot, chatID, machineService)
 	}
 }
 
-// parseTaskInput parsing message to Task
-func parseTaskInput(input string, createdBy int64) (*Task, error) {
-	lines := strings.Split(input, "\n")
-	task := &Task{Createdby: createdBy}
+func showTaskMachineSelection(
+	ctx context.Context,
+	bot *tgBotAPI.BotAPI,
+	chatID int64,
+	machineService MachineService,
+) error {
+	machines, err := machineService.ListMachines(ctx)
+	if err != nil {
+		return err
+	}
+	keyboard := createInlineKeyboard(
+		machines,
+		func(m Machine) string { return m.Name },
+		func(m Machine) string { return "machine_" + strconv.FormatInt(m.ID, 10) },
+	)
 
-	for _, line := range lines {
-		parts := strings.SplitN(line, ":", 2)
-		if len(parts) < 2 {
-			continue
+	msg := tgBotAPI.NewMessage(chatID, "Выберите машину:")
+	msg.ReplyMarkup = keyboard
+	_, err = bot.Send(msg)
+	return err
+}
+
+func TaskCallbackHandler(
+	machineService MachineService,
+	shiftService ShiftService,
+	taskService TaskService,
+) model.ViewFunc {
+	return func(ctx context.Context, bot *tgBotAPI.BotAPI, update tgBotAPI.Update) error {
+		callback := update.CallbackQuery
+		if callback == nil {
+			return nil
 		}
 
-		key := strings.TrimSpace(parts[0])
-		value := strings.TrimSpace(parts[1])
+		chatID := callback.Message.Chat.ID
+		messageID := callback.Message.MessageID
+		data := callback.Data
 
-		switch strings.ToLower(key) {
-		case "машина":
-			_, err := fmt.Sscanf(value, "%d", &task.Machineid)
-			if err != nil {
-				return nil, fmt.Errorf("неверный ID машины")
+		switch {
+		case strings.HasPrefix(data, "machine_"):
+			return showShiftSelection(ctx, bot, chatID, messageID, shiftService, taskService)
+
+		case strings.HasPrefix(data, "shift_"):
+			parts := strings.Split(data, "_")
+			if len(parts) < 3 {
+				return nil
 			}
-		case "смена":
-			_, err := fmt.Sscanf(value, "%d", &task.Shiftid)
-			if err != nil {
-				return nil, fmt.Errorf("неверный ID смены")
-			}
-		case "частота":
-			task.Frequency = value
-		case "приоритет":
-			task.Taskpriority = value
-		case "описание":
-			task.Description = value
+
+			edit := tgBotAPI.NewEditMessageText(chatID, callback.Message.MessageID, "✅ Машина и смена выбраны")
+			bot.Send(edit)
+
+			msg := tgBotAPI.NewMessage(chatID,
+				"Введите остальные данные задачи в формате:\n"+
+					"Частота: [частота]\n"+
+					"Приоритет: [приоритет]\n"+
+					"Описание: [текст]")
+			_, err := bot.Send(msg)
+			return err
 		}
+
+		return nil
+	}
+}
+
+func showShiftSelection(
+	ctx context.Context,
+	bot *tgBotAPI.BotAPI,
+	chatID int64,
+	messageID int,
+	shiftService ShiftService,
+	taskService TaskService,
+) error {
+	shifts, err := shiftService.ListShifts(ctx)
+	if err != nil {
+		return err
 	}
 
-	if task.Machineid == emptyInt || task.Shiftid == emptyInt || task.Description == emptyString {
-		return nil, fmt.Errorf("не заполнены обязательные поля")
-	}
+	keyboard := createInlineKeyboard(
+		shifts,
+		func(s Shift) string { return fmt.Sprintf("shift_master_%d", s.ShiftMasterID) },
+		func(s Shift) string {
+			return fmt.Sprintf("shift_machine_%d", s.Machineid)
+		},
+	)
 
-	return task, nil
+	edit := tgBotAPI.NewEditMessageText(chatID, messageID, "Выберите смену:")
+	edit.ReplyMarkup = &keyboard
+	_, err = bot.Send(edit)
+	return err
 }

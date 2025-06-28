@@ -35,6 +35,7 @@ type MasterIcon struct {
 
 type ShiftService interface {
 	SaveShift(ctx context.Context, shift *Shift) error
+	ListShifts(ctx context.Context) ([]Shift, error)
 }
 
 type ShiftCreationState struct {
