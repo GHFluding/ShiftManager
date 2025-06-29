@@ -33,6 +33,9 @@ type TaskService interface {
 	SaveTask(ctx context.Context, task *Task) error
 }
 
+// parsingValue is prefix_postfix 3 parts, after parsing
+const parsingValue = 3
+
 func CreateTaskHandler(taskService TaskService, machineService MachineService, shiftService ShiftService) model.ViewFunc {
 	return func(ctx context.Context, bot *tgBotAPI.BotAPI, update tgBotAPI.Update) error {
 		chatID := update.Message.Chat.ID
@@ -84,7 +87,7 @@ func TaskCallbackHandler(
 
 		case strings.HasPrefix(data, "shift_"):
 			parts := strings.Split(data, "_")
-			if len(parts) < 3 {
+			if len(parts) < parsingValue {
 				return nil
 			}
 
