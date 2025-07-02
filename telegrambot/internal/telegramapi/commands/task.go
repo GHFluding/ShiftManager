@@ -2,9 +2,8 @@ package commands
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-	"strconv"
-	"strings"
 	"telegramSM/internal/telegramapi/model"
 
 	tgBotAPI "github.com/go-telegram-bot-api/telegram-bot-api"
@@ -33,8 +32,32 @@ type TaskService interface {
 	SaveTask(ctx context.Context, task *Task) error
 }
 
-// parsingValue is prefix_postfix 3 parts, after parsing
-const parsingValue = 3
+const (
+	CallbackTypeMachine = "machine"
+	CallbackTypeShift   = "shift"
+)
+
+type CallbackData struct {
+	Type      string `json:"type"`
+	MachineID int64  `json:"machine_id,omitempty"`
+	ShiftID   int64  `json:"shift_id,omitempty"`
+}
+
+func SerializeCallbackData(data CallbackData) (string, error) {
+	bytes, err := json.Marshal(data)
+	if err != nil {
+		return "", err
+	}
+	return string(bytes), nil
+}
+
+func ParseCallbackData(input string) (CallbackData, error) {
+	var data CallbackData
+	if err := json.Unmarshal([]byte(input), &data); err != nil {
+		return CallbackData{}, err
+	}
+	return data, nil
+}
 
 func CreateTaskHandler(taskService TaskService, machineService MachineService, shiftService ShiftService) model.ViewFunc {
 	return func(ctx context.Context, bot *tgBotAPI.BotAPI, update tgBotAPI.Update) error {
@@ -57,7 +80,13 @@ func showTaskMachineSelection(
 	keyboard := createInlineKeyboard(
 		machines,
 		func(m Machine) string { return m.Name },
-		func(m Machine) string { return "machine_" + strconv.FormatInt(m.ID, 10) },
+		func(m Machine) string {
+			data, _ := SerializeCallbackData(CallbackData{
+				Type:      CallbackTypeMachine,
+				MachineID: m.ID,
+			})
+			return data
+		},
 	)
 
 	msg := tgBotAPI.NewMessage(chatID, "Выберите машину:")
@@ -77,21 +106,20 @@ func TaskCallbackHandler(
 			return nil
 		}
 
+		data, err := ParseCallbackData(callback.Data)
+		if err != nil {
+			return nil
+		}
+
 		chatID := callback.Message.Chat.ID
 		messageID := callback.Message.MessageID
-		data := callback.Data
 
-		switch {
-		case strings.HasPrefix(data, "machine_"):
+		switch data.Type {
+		case CallbackTypeMachine:
 			return showShiftSelection(ctx, bot, chatID, messageID, shiftService, taskService)
 
-		case strings.HasPrefix(data, "shift_"):
-			parts := strings.Split(data, "_")
-			if len(parts) < parsingValue {
-				return nil
-			}
-
-			edit := tgBotAPI.NewEditMessageText(chatID, callback.Message.MessageID, "✅ Машина и смена выбраны")
+		case CallbackTypeShift:
+			edit := tgBotAPI.NewEditMessageText(chatID, messageID, "✅ Машина и смена выбраны")
 			bot.Send(edit)
 
 			msg := tgBotAPI.NewMessage(chatID,
@@ -99,7 +127,7 @@ func TaskCallbackHandler(
 					"Частота: [частота]\n"+
 					"Приоритет: [приоритет]\n"+
 					"Описание: [текст]")
-			_, err := bot.Send(msg)
+			_, err = bot.Send(msg)
 			return err
 		}
 
