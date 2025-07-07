@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"os"
+	service_mock "telegramSM/internal/services/mock"
 	"telegramSM/internal/telegramapi/commands"
 	"telegramSM/internal/telegramapi/model"
 
@@ -21,11 +22,15 @@ func main() {
 
 	router := commands.NewRouter()
 	//TODO: init interfaces
-
+	userService := service_mock.UserServiceMock{}
+	taskService := service_mock.TaskServiceMock{}
+	machineService := service_mock.MachineServiceMock{}
+	shiftService := service_mock.ShiftServiceMock{}
+	masterService := service_mock.MasterServiceMock{}
 	router.RegisterCommandHandler(model.CmdStart, commands.StartHandler(userService))
 	router.RegisterCommandHandler(model.CmdHelp, commands.HelpHandler(userService))
-	router.RegisterCommandHandler(model.CmdCreateTask, commands.CreateTaskHandler(taskService, machineService))
-
+	router.RegisterCommandHandler(model.CmdCreateTask, commands.CreateTaskHandler(taskService, machineService, shiftService))
+	router.RegisterCommandHandler(model.CmdCreateShift, commands.CreateShiftHandler(shiftService, machineService, masterService))
 	//TODO: refactor callback register function
 	router.RegisterMessageHandler(commands.SkipBitrixHandler(userService))
 	router.RegisterMessageHandler(commands.TaskCallbackHandler(machineService, shiftService, taskService))

@@ -15,17 +15,8 @@ type Shift struct {
 	ShiftMasterID int64
 }
 
-type MachineIconService interface {
-	ListMachines(ctx context.Context) ([]MachineIcon, error)
-}
-
 type MasterIconService interface {
 	ListMasters(ctx context.Context) ([]MasterIcon, error)
-}
-
-type MachineIcon struct {
-	ID   int64
-	Name string
 }
 
 type MasterIcon struct {
@@ -69,7 +60,7 @@ const (
 
 func CreateShiftHandler(
 	shiftService ShiftService,
-	machineService MachineIconService,
+	machineService MachineService,
 	masterService MasterIconService,
 ) model.ViewFunc {
 	return func(ctx context.Context, bot *tgBotAPI.BotAPI, update tgBotAPI.Update) error {
@@ -109,7 +100,7 @@ func handleMachineStep(
 	bot *tgBotAPI.BotAPI,
 	update tgBotAPI.Update,
 	state *ShiftCreationState,
-	machineService MachineIconService,
+	machineService MachineService,
 	masterService MasterIconService,
 	chatID int64,
 ) error {
@@ -157,7 +148,7 @@ func showMachineSelection(
 	ctx context.Context,
 	bot *tgBotAPI.BotAPI,
 	chatID int64,
-	machineService MachineIconService,
+	machineService MachineService,
 ) error {
 	machines, err := machineService.ListMachines(ctx)
 	if err != nil {
@@ -174,10 +165,10 @@ func showMachineSelection(
 
 	keyboard := createInlineKeyboard(
 		machines,
-		func(m MachineIcon) string {
+		func(m Machine) string {
 			return fmt.Sprintf("%s (ID: %d)", m.Name, m.ID)
 		},
-		func(m MachineIcon) string {
+		func(m Machine) string {
 			return callbackMachinePrefix + strconv.FormatInt(m.ID, 10)
 		},
 	)
@@ -225,7 +216,7 @@ func showMasterSelection(
 
 func ShiftCallbackHandler(
 	shiftService ShiftService,
-	machineService MachineIconService,
+	machineService MachineService,
 	masterService MasterIconService,
 ) model.ViewFunc {
 	return func(ctx context.Context, bot *tgBotAPI.BotAPI, update tgBotAPI.Update) error {
@@ -263,7 +254,7 @@ func handleMachineCallback(
 	bot *tgBotAPI.BotAPI,
 	callback *tgBotAPI.CallbackQuery,
 	state *ShiftCreationState,
-	machineService MachineIconService,
+	machineService MachineService,
 	masterService MasterIconService,
 	chatID int64,
 ) error {
