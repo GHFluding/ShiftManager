@@ -32,6 +32,7 @@ func main() {
 	router.RegisterCommandHandler(model.CmdCreateTask, commands.CreateTaskHandler(taskService, machineService, shiftService))
 	router.RegisterCommandHandler(model.CmdCreateShift, commands.CreateShiftHandler(shiftService, machineService, masterService))
 	//TODO: refactor callback register function
+	router.RegisterMessageHandler(commands.NameHandler(userService))
 	router.RegisterMessageHandler(commands.SkipBitrixHandler(userService))
 	router.RegisterMessageHandler(commands.TaskCallbackHandler(machineService, shiftService, taskService))
 

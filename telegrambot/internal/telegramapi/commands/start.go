@@ -30,7 +30,6 @@ type UserService interface {
 	SaveUser(ctx context.Context, user *User) error
 }
 
-// StartHandler
 func StartHandler(userService UserService) model.ViewFunc {
 	return func(ctx context.Context, bot *tgBotAPI.BotAPI, update tgBotAPI.Update) error {
 		userID := update.Message.From.ID
@@ -38,7 +37,16 @@ func StartHandler(userService UserService) model.ViewFunc {
 
 		user, err := userService.GetUser(ctx, userID)
 		if err != nil {
-			user = &User{TelegramID: userID}
+			user = &User{
+				TelegramID: userID,
+				Data: UserData{
+					Name:   "",
+					BtrxID: "",
+				},
+			}
+			if err := userService.SaveUser(ctx, user); err != nil {
+				return err
+			}
 		}
 
 		if user.Data.Name == emptyString {
@@ -68,7 +76,7 @@ func NameHandler(userService UserService) model.ViewFunc {
 
 		user, err := userService.GetUser(ctx, userID)
 		if err != nil {
-			return err
+			user = &User{TelegramID: userID}
 		}
 
 		if len(name) < 5 || !strings.Contains(name, " ") {
@@ -78,11 +86,11 @@ func NameHandler(userService UserService) model.ViewFunc {
 		}
 
 		user.Data.Name = name
-		_ = userService.SaveUser(ctx, user)
+		if err := userService.SaveUser(ctx, user); err != nil {
+			return err
+		}
 
-		msg := tgBotAPI.NewMessage(chatID, "✅ ФИО сохранено! Теперь введите ваш Bitrix24 ID (или 'нет'):")
-		_, err = bot.Send(msg)
-		return err
+		return askBitrixID(ctx, bot, update.Message.Chat.ID, userService)
 	}
 }
 
@@ -104,6 +112,8 @@ func askBitrixID(
 	return err
 }
 
+//TODO: rework BITRIX handler
+
 func SkipBitrixHandler(userService UserService) model.ViewFunc {
 	return func(ctx context.Context, bot *tgBotAPI.BotAPI, update tgBotAPI.Update) error {
 		callback := update.CallbackQuery
@@ -116,11 +126,14 @@ func SkipBitrixHandler(userService UserService) model.ViewFunc {
 
 		user, err := userService.GetUser(ctx, userID)
 		if err != nil {
-			return err
+			user = &User{TelegramID: userID}
 		}
 
-		edit := tgBotAPI.NewEditMessageText(chatID, callback.Message.MessageID, "✅ Ввод Bitrix24 ID пропущен")
+		edit := tgBotAPI.NewEditMessageReplyMarkup(chatID, callback.Message.MessageID, tgBotAPI.InlineKeyboardMarkup{})
 		bot.Send(edit)
+
+		editText := tgBotAPI.NewEditMessageText(chatID, callback.Message.MessageID, "✅ Ввод Bitrix24 ID пропущен")
+		bot.Send(editText)
 
 		confirmation := fmt.Sprintf(
 			"✅ Регистрация завершена!\n👤 ФИО: %s\n\nТеперь вам доступны все функции бота.",
