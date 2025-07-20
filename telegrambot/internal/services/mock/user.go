@@ -7,20 +7,28 @@ import (
 )
 
 type UserServiceMock struct {
-	userList []commands.User
+	userList []*commands.User
 }
 
-func (us UserServiceMock) GetUser(ctx context.Context, telegramID int) (*commands.User, error) {
+func (us *UserServiceMock) GetUser(ctx context.Context, telegramID int) (*commands.User, error) {
 	for _, user := range us.userList {
 		if user.TelegramID == telegramID {
-			return &user, nil
+			return user, nil
 		}
 	}
-	err := fmt.Errorf("undefined user")
-	return nil, err
+	return nil, fmt.Errorf("undefined user")
 }
-func (us UserServiceMock) SaveUser(ctx context.Context, user *commands.User) error {
-	us.userList = append(us.userList, *user)
+
+func (us *UserServiceMock) SaveUser(ctx context.Context, user *commands.User) error {
+	for i, existingUser := range us.userList {
+		if existingUser.TelegramID == user.TelegramID {
+
+			us.userList[i] = user
+			return nil
+		}
+	}
+
+	us.userList = append(us.userList, user)
 	return nil
 }
 

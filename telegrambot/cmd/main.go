@@ -22,11 +22,11 @@ func main() {
 
 	router := commands.NewRouter()
 	//TODO: init interfaces
-	userService := service_mock.UserServiceMock{}
-	taskService := service_mock.TaskServiceMock{}
-	machineService := service_mock.MachineServiceMock{}
-	shiftService := service_mock.ShiftServiceMock{}
-	masterService := service_mock.MasterServiceMock{}
+	userService := &service_mock.UserServiceMock{}
+	taskService := &service_mock.TaskServiceMock{}
+	machineService := &service_mock.MachineServiceMock{}
+	shiftService := &service_mock.ShiftServiceMock{}
+	masterService := &service_mock.MasterServiceMock{}
 	router.RegisterCommandHandler(model.CmdStart, commands.StartHandler(userService))
 	router.RegisterCommandHandler(model.CmdHelp, commands.HelpHandler(userService))
 	router.RegisterCommandHandler(model.CmdCreateTask, commands.CreateTaskHandler(taskService, machineService, shiftService))

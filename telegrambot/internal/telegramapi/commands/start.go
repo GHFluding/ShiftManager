@@ -17,7 +17,6 @@ type User struct {
 }
 
 const emptyString = ""
-const emptyInt = 0
 
 type UserData struct {
 	Name   string `json:"name"`
@@ -50,17 +49,17 @@ func StartHandler(userService UserService) model.ViewFunc {
 		}
 
 		if user.Data.Name == emptyString {
-			msg := tgBotAPI.NewMessage(chatID, "Введите ваше ФИО (полное имя с пробелом):")
+			msg := tgBotAPI.NewMessage(chatID, "👤 Введите ваше ФИО (полное имя с пробелом):")
 			_, err = bot.Send(msg)
 			return err
 		}
 
 		if user.Data.BtrxID == emptyString {
-			return askBitrixID(ctx, bot, chatID, userService)
+			return askBitrixID(ctx, bot, chatID)
 		}
 
 		msg := tgBotAPI.NewMessage(chatID, fmt.Sprintf(
-			"👋 Добро пожаловать, %s!\n\n "+string(model.CmdHelp)+" для списка команд.",
+			"👋 Добро пожаловать, %s!\n\nВведите /help для списка команд.",
 			user.Data.Name,
 		))
 		_, err = bot.Send(msg)
@@ -76,7 +75,10 @@ func NameHandler(userService UserService) model.ViewFunc {
 
 		user, err := userService.GetUser(ctx, userID)
 		if err != nil {
-			user = &User{TelegramID: userID}
+			user = &User{
+				TelegramID: userID,
+				Data:       UserData{},
+			}
 		}
 
 		if len(name) < 5 || !strings.Contains(name, " ") {
@@ -86,11 +88,12 @@ func NameHandler(userService UserService) model.ViewFunc {
 		}
 
 		user.Data.Name = name
+		user.Data.BtrxID = emptyString
 		if err := userService.SaveUser(ctx, user); err != nil {
 			return err
 		}
 
-		return askBitrixID(ctx, bot, update.Message.Chat.ID, userService)
+		return askBitrixID(ctx, bot, chatID)
 	}
 }
 
@@ -98,7 +101,6 @@ func askBitrixID(
 	ctx context.Context,
 	bot *tgBotAPI.BotAPI,
 	chatID int64,
-	userService UserService,
 ) error {
 	msg := tgBotAPI.NewMessage(chatID, "Введите ваш Bitrix24 ID или нажмите 'Пропустить':")
 	keyboard := createInlineKeyboard(
@@ -112,7 +114,40 @@ func askBitrixID(
 	return err
 }
 
-//TODO: rework BITRIX handler
+func BitrixHandler(userService UserService) model.ViewFunc {
+	return func(ctx context.Context, bot *tgBotAPI.BotAPI, update tgBotAPI.Update) error {
+		bitrixID := strings.TrimSpace(update.Message.Text)
+		if bitrixID == "" {
+			return nil
+		}
+
+		userID := update.Message.From.ID
+		chatID := update.Message.Chat.ID
+
+		user, err := userService.GetUser(ctx, userID)
+		if err != nil {
+			return err
+		}
+		if user.Data.Name != emptyString {
+			user.Data.BtrxID = bitrixID
+			if err := userService.SaveUser(ctx, user); err != nil {
+				return err
+			}
+			userData, err := userService.GetUser(ctx, userID)
+			if err != nil {
+				return err
+			}
+			confirmation := fmt.Sprintf(
+				"✅ Регистрация завершена!\n👤 ФИО: %s\n🔗 Bitrix24 ID: %s\n\nТеперь вам доступны все функции бота.",
+				userData.Data.Name,
+				userData.Data.BtrxID,
+			)
+			msg := tgBotAPI.NewMessage(chatID, confirmation)
+			_, err = bot.Send(msg)
+		}
+		return err
+	}
+}
 
 func SkipBitrixHandler(userService UserService) model.ViewFunc {
 	return func(ctx context.Context, bot *tgBotAPI.BotAPI, update tgBotAPI.Update) error {
@@ -126,7 +161,12 @@ func SkipBitrixHandler(userService UserService) model.ViewFunc {
 
 		user, err := userService.GetUser(ctx, userID)
 		if err != nil {
-			user = &User{TelegramID: userID}
+			return err
+		}
+
+		user.Data.BtrxID = ""
+		if err := userService.SaveUser(ctx, user); err != nil {
+			return err
 		}
 
 		edit := tgBotAPI.NewEditMessageReplyMarkup(chatID, callback.Message.MessageID, tgBotAPI.InlineKeyboardMarkup{})
@@ -136,7 +176,7 @@ func SkipBitrixHandler(userService UserService) model.ViewFunc {
 		bot.Send(editText)
 
 		confirmation := fmt.Sprintf(
-			"✅ Регистрация завершена!\n👤 ФИО: %s\n\nТеперь вам доступны все функции бота.",
+			"✅ Регистрация завершена!\n👤 ФИО: %s\n🔗 Bitrix24 ID пропущен.\n\nТеперь вам доступны все функции бота.",
 			user.Data.Name,
 		)
 
