@@ -59,6 +59,7 @@ func ParseCallbackData(input string) (CallbackData, error) {
 	return data, nil
 }
 
+// refactor this handler
 func CreateTaskHandler(taskService TaskService, machineService MachineService, shiftService ShiftService) model.ViewFunc {
 	return func(ctx context.Context, bot *tgBotAPI.BotAPI, update tgBotAPI.Update) error {
 		chatID := update.Message.Chat.ID

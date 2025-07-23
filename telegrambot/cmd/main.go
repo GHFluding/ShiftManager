@@ -35,6 +35,7 @@ func main() {
 	router.RegisterMessageHandler(commands.NameHandler(userService))
 	router.RegisterMessageHandler(commands.SkipBitrixHandler(userService))
 	router.RegisterMessageHandler(commands.TaskCallbackHandler(machineService, shiftService, taskService))
+	router.RegisterCallbackHandler(commands.SkipBitrixHandler(userService))
 
 	u := tgBotAPI.NewUpdate(0)
 	u.Timeout = 60

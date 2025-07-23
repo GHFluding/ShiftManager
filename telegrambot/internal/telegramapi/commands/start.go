@@ -78,6 +78,7 @@ func NameHandler(userService UserService) model.ViewFunc {
 			user = &User{
 				TelegramID: userID,
 				Data:       UserData{},
+				Role:       model.RoleWorker,
 			}
 		}
 
@@ -128,7 +129,7 @@ func BitrixHandler(userService UserService) model.ViewFunc {
 		if err != nil {
 			return err
 		}
-		if user.Data.Name != emptyString {
+		if user.Data.Name != emptyString && user.Data.Name != bitrixID {
 			user.Data.BtrxID = bitrixID
 			if err := userService.SaveUser(ctx, user); err != nil {
 				return err
