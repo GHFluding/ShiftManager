@@ -5,4 +5,5 @@ use (
 	./SMgrpc
 	./bitrixSM
 	./link
+	./telegrambot
 )
